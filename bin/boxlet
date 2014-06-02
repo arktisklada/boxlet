@@ -1,0 +1,12 @@
+#! /usr/bin/env ruby
+
+require "boxlet"
+
+# Check to make sure we aren't running in Windows
+if RUBY_PLATFORM =~ /(win|w)32$/ then
+  puts "Sorry, Boxlet is currently only available for Unix/Linux."
+  exit!
+end
+
+server = Boxlet::Server.new
+server.run

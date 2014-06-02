@@ -1,0 +1,8 @@
+# Boxlet configuration file
+
+# TCP Debug mode changes logging level between WARN (false) and DEBUG (true)
+tcp_debug: true
+
+# Server configuration
+tcp_listen_ip: 127.0.0.1
+tcp_listen_port: 8077
