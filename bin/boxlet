@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require "bundler"
+Bundler.setup
+Bundler.require
+
+
+require 'boxlet'
+
+Boxlet.run! Hash[*ARGV]
