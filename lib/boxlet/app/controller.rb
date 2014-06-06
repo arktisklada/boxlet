@@ -18,7 +18,7 @@ module Boxlet
     # actions
 
     def index
-      '<html><body><form action="/push_files" method="post" type="multipart"><input type="file" name="file"><input type="submit"></form>'
+      '<html><body><form action="/push_files" method="post" enctype="multipart/form-data"><input type="file" name="file"><input type="submit"></form>'
     end
 
     def path

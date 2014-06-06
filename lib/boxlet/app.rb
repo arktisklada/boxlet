@@ -17,7 +17,7 @@ module Boxlet
         routes = {
           "/"           => Boxlet::Router.new(:get, :index),
           "/auth"       => Boxlet::Router.new(:get, :path),
-          "/push_files" => Boxlet::Router.new(:get, :push_files)
+          "/push_files" => Boxlet::Router.new(:post, :push_files)
         }
 
         routes.each do |path, app|
@@ -25,6 +25,7 @@ module Boxlet
             run app
           end
         end
+        
       end
     end
 
