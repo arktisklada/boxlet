@@ -1,6 +1,6 @@
 require "rack/request"
 require "rack/response"
-require "boxlet/controller"
+require "boxlet/app/controller"
 
 
 module Boxlet
@@ -8,24 +8,34 @@ module Boxlet
 
     attr_accessor :method, :action
 
-    def initialize(method, action)
-      @method = method
-      @action = action
+    # def initialize
       # lambda { |env|
       #   # Boxlet::Controller.route!
       #   # lambda {|*|}
       # }
+    # end
+
+    def initialize(method, action)
+      @method = method.to_sym
+      @action = action.to_sym
     end
 
     def call(env)
       request = Rack::Request.new(env)
+      p request
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)
       if (request.get? && @method == :get) || (request.post? && @method == :post)
-        response.write controller.send(@action.to_sym)
+        action_response = controller.action(@action)
       else
         # response_text = "nope"
-        raise "crashed"
+        raise "404"
+      end
+
+      if action_response[:format] == :json
+        response.write action_response[:content].to_json
+      else
+        response.write action_response[:content]
       end
 
       response.finish

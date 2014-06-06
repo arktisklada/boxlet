@@ -1,14 +1,14 @@
 require "rack/boxlet_url_builder"
 require "rack/request"
 require "rack/response"
-require "boxlet/router"
+require "boxlet/app/router"
 # require "boxlet/controller"
-require "rack/lobster"
+# require "rack/lobster"
 
 
 module Boxlet
   class App
-    attr_accessor :app, :params, :routes
+    attr_accessor :app, :params
 
     def initialize(params={})
       @params = params
@@ -16,10 +16,9 @@ module Boxlet
 
     def bind
       Rack::Builder.new do
-
         routes = {
           "/"       => Boxlet::Router.new(:get, :index),
-          "/path"   => Boxlet::Router.new(:get, :path)
+          "/auth"   => Boxlet::Router.new(:get, :path)
         }
 
         routes.each do |path, app|
@@ -28,10 +27,10 @@ module Boxlet
           end
         end
 
-        map "/lobster" do
-          use Rack::ShowExceptions
-          run Rack::Lobster.new
-        end
+        # map "/lobster" do
+        #   use Rack::ShowExceptions
+        #   run Rack::Lobster.new
+        # end
       end
     end
 

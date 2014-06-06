@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.files         = %w[config.yml LICENSE.txt README.md Rakefile boxlet.gemspec]
   spec.files         += Dir.glob('lib/**/*.rb')
+  spec.files         += Dir.glob('lib/boxlet/app/*.rb')
 
   spec.executables   = 'boxlet'
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})

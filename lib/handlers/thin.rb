@@ -5,6 +5,7 @@ require "rack/chunked"
 
 module Boxlet
   module Handlers
+    
     # ported from https://github.com/rack/rack/tree/master/lib/rack/handler/thin.rb
     class Thin
       def run(app, options={})
