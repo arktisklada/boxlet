@@ -15,8 +15,9 @@ module Boxlet
     def bind
       Rack::Builder.new do
         routes = {
-          "/"       => Boxlet::Router.new(:get, :index),
-          "/auth"   => Boxlet::Router.new(:get, :path)
+          "/"           => Boxlet::Router.new(:get, :index),
+          "/auth"       => Boxlet::Router.new(:get, :path),
+          "/push_files" => Boxlet::Router.new(:get, :push_files)
         }
 
         routes.each do |path, app|

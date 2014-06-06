@@ -18,12 +18,16 @@ module Boxlet
     # actions
 
     def index
-      "welcome"
+      '<html><body><form action="/push_files" method="post" type="multipart"><input type="file" name="file"><input type="submit"></form>'
     end
 
     def path
       @format = :json
       "auth"
+    end
+
+    def push_files
+      @format = :json
     end
 
   end
