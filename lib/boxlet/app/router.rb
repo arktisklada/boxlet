@@ -15,12 +15,14 @@ module Boxlet
 
     def call(env)
       request = Rack::Request.new(env)
-      p request
+
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)
       if (request.get? && @method == :get) || (request.post? && @method == :post)
         action_response = controller.action(@action)
+        response.status = 200
       else
+        response.status = 404
         raise "404"
       end
 

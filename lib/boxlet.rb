@@ -3,6 +3,7 @@ require "boxlet/version"
 require "boxlet/app"
 require "boxlet/arguments"
 require "boxlet/runner"
+require "pp"
 
 
 module Boxlet

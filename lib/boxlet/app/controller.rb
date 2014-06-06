@@ -3,10 +3,11 @@ require "json"
 
 module Boxlet
   class Controller
-    attr_accessor :request, :format
+    attr_accessor :request, :format, :params
 
     def initialize(request)
       @request = request
+      @params = request.params
       @format = :html
     end
 
@@ -28,6 +29,7 @@ module Boxlet
 
     def push_files
       @format = :json
+      p File.exists? @params["file"]
     end
 
   end
