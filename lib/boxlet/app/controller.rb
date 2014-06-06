@@ -1,5 +1,6 @@
 require "json"
 
+
 module Boxlet
   class Controller
     attr_accessor :request, :format
@@ -9,6 +10,13 @@ module Boxlet
       @format = :html
     end
 
+    def action(action)
+      action_response = self.send(action)
+      return {format: @format, content: action_response}
+    end
+
+    # actions
+
     def index
       "welcome"
     end
@@ -16,12 +24,6 @@ module Boxlet
     def path
       @format = :json
       "auth"
-    end
-
-
-    def action(action)
-      action_response = self.send(action)
-      return {format: @format, content: action_response}
     end
 
   end
