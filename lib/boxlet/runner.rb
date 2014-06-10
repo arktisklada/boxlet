@@ -3,13 +3,18 @@ require "handlers/thin"
 
 module Boxlet
   class Runner
-
     attr_accessor :server, :server_instance
 
     def start(app, params, &block)
+      environment  = ENV['RACK_ENV'] || 'development'
+      default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
+
+      params[:Host] = params.delete(:host) || default_host
+      params[:Port] = params.delete(:port) || 8077
+
       server_type = params.delete(:server_type) || :thin
-      @server_instance = self.send server_type.to_sym
-      @server_instance.run(app, params) do |server|
+      @server_instance = self.send server_type.to_sym, app, params
+      @server_instance.start do |server|
         self.server = server
         block.call(server) if block_given?
       end
@@ -19,8 +24,12 @@ module Boxlet
       @server.stop!
     end
 
-    def thin
-      Boxlet::Handlers::Thin.new
+    def rack(app, params)
+      Rack::Server.new(params.merge({app: app}))
+    end
+
+    def thin(app, params)
+      Boxlet::Handlers::Thin.new(app, params)
     end
 
   end

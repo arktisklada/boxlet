@@ -1,4 +1,5 @@
 require "rack/boxlet_url_builder"
+require "rack/file_upload"
 require "rack/request"
 require "rack/response"
 require "boxlet/app/router"
@@ -14,6 +15,8 @@ module Boxlet
 
     def bind
       Rack::Builder.new do
+        use Rack::FileUpload, :upload_dir => ['./uploads']
+
         routes = {
           "/"           => Boxlet::Router.new(:get, :index),
           "/auth"       => Boxlet::Router.new(:get, :path),

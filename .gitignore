@@ -18,8 +18,8 @@ tmp
 log
 test.rb
 test_run
-
+.rvmrc
 notes
-
+uploads
 
 config.ru

@@ -29,7 +29,12 @@ module Boxlet
 
     def push_files
       @format = :json
-      p File.exists? @params["file"]
+
+      upload_path = @params[:upload_path] || './uploads'
+      file = @request.params["file"]
+      FileUtils.mv file[:tempfile].path, File.join(upload_path, file[:filename])
+
+      File.exists? File.join(upload_path, file[:filename])
     end
 
   end

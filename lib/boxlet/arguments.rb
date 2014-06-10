@@ -2,26 +2,45 @@ module Boxlet
   module Arguments
 
     ARGS  = {
-      :path   => {
+      :path => {
         :short      => 'f',
         :default    => Proc.new { Dir.pwd }
       },
-      :port   => {
+      :port => {
         :short      => 'p',
         :default    => 8077,
-        :sanitizer  => Proc.new { |v| v.to_i }
+        :sanitizer  => Proc.new { |p| p.to_i }
       },
-      :host   => {
-        :short      => 'h',
-        :default    => '0.0.0.0'
-      },
-      :index  => {
-        :short      => 'i',
-        :default    => 'index.html'
+      :host => {
+        :short      => 'o',
+        :default    => 'localhost'
       },
       :server_type => {
         :short      => 's',
-        :default    => 'thin'
+        :default    => 'rack',
+        :sanitizer  => Proc.new { |p| p.to_sym }
+      },
+      :environment => {
+        :short      => 'E',
+        :default    => 'development'
+      },
+      :daemonize => {
+        :short      => 'D',
+        :default    => false,
+        :sanitizer  => Proc.new { |p| p == 'true' }
+      },
+      :debug => {
+        :short      => 'd',
+        :default    => false,
+        :sanitizer  => Proc.new { |p| p == 'true' }
+      },
+      :upload_dir => {
+        :short      => 'U',
+        :default    => './uploads'
+      },
+      :tmp_dir => {
+        :short      => 'T',
+        :default    => './tmp'
       }
     }
 
