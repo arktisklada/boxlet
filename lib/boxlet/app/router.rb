@@ -9,8 +9,8 @@ module Boxlet
     attr_accessor :method, :action
 
     def initialize(method, action)
-      @method = method.to_sym
-      @action = action.to_sym
+      @method = method
+      @action = action
     end
 
     def call(env)
@@ -18,7 +18,7 @@ module Boxlet
 
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)
-      if (request.get? && @method == :get) || (request.post? && @method == :post)
+      if (@method == :* || request.get? && @method == :get) || (request.post? && @method == :post)
         action_response = controller.action(@action)
         response.status = 200
       else

@@ -1,35 +1,44 @@
+require "yaml"
 require "rack/contrib"
 require "boxlet/version"
 require "boxlet/app"
-require "boxlet/arguments"
+require "boxlet/config"
 require "boxlet/runner"
-require "pp"
+require "pp" unless ENV['RACK_ENV'] == 'production'
+
+
+APP_ROOT = Dir.pwd
 
 
 module Boxlet
 
   extend self
-  extend Boxlet::Arguments
+  extend Boxlet::Config
 
-  attr_accessor :runner, :params
+  attr_accessor :runner, :params, :config
 
   def run!(argv, &blk)
-    @params = parse_input(argv)
+    populate_params!(argv, 'config.yml')
+    
     # params[:app] = Boxlet::App.new(params).bind
     # params[:Port] = params.delete(:port) || 8077
     # params[:Host] = params.delete(:host) || 'localhost'
     # Rack::Server.start(params)
     app = Boxlet::App.new(@params).bind
-    runner = Boxlet::Runner.new
-    runner.start(app, @params, &blk)
+    @runner = Boxlet::Runner.new
+    @runner.start(app, @params, &blk)
+    return app
   end
 
   def stop!
-    runner.stop
+    @runner.stop
+    return app
   end
 
 end
 
+
+# Configure our temporary folder
 class Dir  
   def Dir::tmpdir
     tmp = './tmp'

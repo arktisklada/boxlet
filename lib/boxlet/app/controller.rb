@@ -16,13 +16,14 @@ module Boxlet
       return {format: @format, content: action_response}
     end
 
+
     # actions
 
     def index
       '<html><body><form action="/push_files" method="post" enctype="multipart/form-data"><input type="file" name="file"><input type="submit"></form>'
     end
 
-    def path
+    def auth
       @format = :json
       "auth"
     end
@@ -35,6 +36,14 @@ module Boxlet
       FileUtils.mv file[:tempfile].path, File.join(upload_path, file[:filename])
 
       File.exists? File.join(upload_path, file[:filename])
+    end
+
+    def file_list
+      @format = :json
+
+      upload_path = @params[:upload_path] || './uploads'
+
+      Dir.glob(File.join("#{upload_path}/*")).map {|d| d.gsub("#{upload_path}/", '')}
     end
 
   end
