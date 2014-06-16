@@ -24,6 +24,7 @@ module Boxlet
     # params[:Port] = params.delete(:port) || 8077
     # params[:Host] = params.delete(:host) || 'localhost'
     # Rack::Server.start(params)
+
     app = Boxlet::App.new(@params).bind
     @runner = Boxlet::Runner.new
     @runner.start(app, @params, &blk)

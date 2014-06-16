@@ -58,7 +58,14 @@ module Boxlet
 
       upload_path = @params[:upload_path] || './uploads'
 
-      Dir.glob(File.join("#{upload_path}/*")).map {|d| d.gsub("#{upload_path}/", '')}
+      Dir.glob(File.join("#{upload_path}/*")).map do |d|
+        file = File.open(d, 'r')
+        {
+          size: file.size,
+          date: file.mtime.to_i,
+          filename: d.gsub("#{upload_path}/", '')
+        }
+      end
     end
 
   end
