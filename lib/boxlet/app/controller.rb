@@ -1,4 +1,11 @@
-require "json"
+# routes = {
+#   ["/", :get]                 => :index,
+#   ["/auth"]                   => :auth,
+#   ["/register_device": :post] => :register_device,
+#   ["/notifications": :post]   => :notifications,
+#   ["/push_files", :post]      => :push_files,
+#   ["/file_list", :get]        => :file_list
+# }
 
 
 module Boxlet
@@ -26,6 +33,14 @@ module Boxlet
     def auth
       @format = :json
       "auth"
+    end
+
+    def register_device
+      "register_device"
+    end
+
+    def notifications
+      "notifications"
     end
 
     def push_files

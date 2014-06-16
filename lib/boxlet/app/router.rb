@@ -1,6 +1,7 @@
 require "rack/request"
 require "rack/response"
 require "boxlet/app/controller"
+require "json"
 
 
 module Boxlet
@@ -15,6 +16,8 @@ module Boxlet
 
     def call(env)
       request = Rack::Request.new(env)
+
+      # puts "#{@method} #{@action} #{request.get?} #{request.post?}" if Boxlet::Config::debug?
 
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)

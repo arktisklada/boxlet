@@ -14,7 +14,7 @@ host: localhost
 server_type: thin
 environment: development
 # daemonize
-debug: true
+debug: false
 # path
 # upload_dir
 # tmp_dir

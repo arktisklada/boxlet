@@ -20,10 +20,12 @@ module Boxlet
         use Rack::FileUpload, :upload_dir => [APP_ROOT + '/uploads']
 
         routes = {
-          ["/", :get]             => :index,
-          ["/auth"]               => Boxlet::Router.new(:get, :auth),
-          ["/push_files", :post]  => :push_files,
-          ["/file_list", :get]    => :file_list
+          ["/", :get]                 => :index,
+          ["/auth"]                   => :auth,
+          ["/register_device", :post] => :register_device,
+          ["/notifications", :post]   => :notifications,
+          ["/push_files", :post]      => :push_files,
+          ["/file_list"]              => :file_list
         }
 
         routes.each do |route, action|
