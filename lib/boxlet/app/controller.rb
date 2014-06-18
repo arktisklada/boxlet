@@ -1,10 +1,11 @@
 # routes = {
 #   ["/", :get]                 => :index,
 #   ["/auth"]                   => :auth,
-#   ["/register_device": :post] => :register_device,
-#   ["/notifications": :post]   => :notifications,
+#   ["/register_device", :post] => :register_device,
+#   ["/notifications", :post]   => :notifications,
 #   ["/push_files", :post]      => :push_files,
-#   ["/file_list", :get]        => :file_list
+#   ["/file_list"]              => :file_list,
+#   ["/file_info"]              => :file_info
 # }
 
 
@@ -46,26 +47,44 @@ module Boxlet
     def push_files
       @format = :json
 
-      upload_path = @params[:upload_path] || './uploads'
-      file = @request.params["file"]
-      FileUtils.mv file[:tempfile].path, File.join(upload_path, file[:filename])
+      upload_path = Boxlet.config[:upload_path] || './uploads'
+      upload_file = @params["file"]
+      new_path = File.join(upload_path, upload_file[:filename])
+      FileUtils.mv(upload_file[:tempfile].path, new_path)
 
-      File.exists? File.join(upload_path, file[:filename])
+      if File.exists? File.join(upload_path, upload_file[:filename])
+        file = File.open(File.join(upload_path, upload_file[:filename]), 'r')
+        asset = {
+          filename: upload_file[:filename],
+          size: file.size,
+          date: file.mtime.to_i,
+          asset_path: @params["asset_path"]
+        }
+        db.collection('assets').insert(asset)
+        true
+      else
+        false
+      end
     end
 
     def file_list
       @format = :json
 
-      upload_path = @params[:upload_path] || './uploads'
+      db.collection('assets').find().to_a
+    end
 
-      Dir.glob(File.join("#{upload_path}/*")).map do |d|
-        file = File.open(d, 'r')
-        {
-          size: file.size,
-          date: file.mtime.to_i,
-          filename: d.gsub("#{upload_path}/", '')
-        }
-      end
+    def file_info
+      @format = :json
+
+      asset_path = @params[:asset_path]
+      db.collection('assets').find({asset_path: asset_path}).to_a.first
+    end
+
+
+    private
+
+    def db
+      Boxlet::Db.connection
     end
 
   end

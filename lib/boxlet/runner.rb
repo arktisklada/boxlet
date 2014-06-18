@@ -5,8 +5,9 @@ module Boxlet
   class Runner
     attr_accessor :server, :server_instance
 
-    def start(app, params, &block)
-      environment  = ENV['RACK_ENV'] || 'development'
+    def start(app, &block)
+      params = Boxlet.config
+      environment  = ENV['RACK_ENV'] || params[:environment] rescue 'development'
       default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
 
       params[:Host] = params.delete(:host) || default_host

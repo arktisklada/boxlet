@@ -15,7 +15,7 @@ module Boxlet
   extend self
   extend Boxlet::Config
 
-  attr_accessor :runner, :params, :config
+  attr_accessor :runner, :config, :raw_params, :raw_config
 
   def run!(argv, &blk)
     populate_params!(argv, 'config.yml')
@@ -25,15 +25,23 @@ module Boxlet
     # params[:Host] = params.delete(:host) || 'localhost'
     # Rack::Server.start(params)
 
-    app = Boxlet::App.new(@params).bind
+    app = Boxlet::App.new.bind
     @runner = Boxlet::Runner.new
-    @runner.start(app, @params, &blk)
+    @runner.start(app, &blk)
     return app
   end
 
   def stop!
     @runner.stop
     return app
+  end
+
+  def config
+    @config
+  end
+
+  def params
+    @params
   end
 
 end

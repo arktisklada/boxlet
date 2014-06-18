@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rack-contrib", "~> 1.1"
   spec.add_dependency "thin", "~> 1.6"
   spec.add_dependency "multi_json", "~> 1.10.1"
+  spec.add_dependency "mongo", "~> 1.10.2"
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"

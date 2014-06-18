@@ -14,7 +14,17 @@ host: localhost
 server_type: thin
 environment: development
 # daemonize
-debug: false
+debug: true
 # path
 # upload_dir
 # tmp_dir
+db:
+  development:
+    host: localhost
+    db: boxlet_dev
+  production:
+    host: localhost
+    # port:
+    # user:
+    # pass:
+    db: boxlet

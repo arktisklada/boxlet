@@ -1,6 +1,7 @@
 require "logger"
 require "fileutils"
 
+
 module Log
   def get_logger(name, shift_age, shift_size, level)
     # create the directory for the log if it doesn't exist

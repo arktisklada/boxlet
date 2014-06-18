@@ -46,10 +46,11 @@ module Boxlet
 
 
     def populate_params!(argv, path_to_config=nil)
-      @config = load_config_file(path_to_config) unless path_to_config == nil
-      @params = parse_arguments(argv).merge(@config)
-      if @params[:debug]
-        pp @params
+      @raw_config = load_config_file(path_to_config) unless path_to_config == nil
+      @raw_params = parse_arguments(argv)
+      @config = @raw_params.merge(@raw_config)
+      if @config[:debug]
+        pp @config
       end
     end
 
@@ -61,7 +62,7 @@ module Boxlet
 
       ARGS.each_pair do |param_name, param_attrs|
         param_short_name = param_attrs[:short]
-        config_value = @config[param_name.to_sym]
+        config_value = @raw_config[param_name.to_sym]
         default = param_attrs[:default]
         sanitizer = param_attrs[:sanitizer]
 
@@ -81,7 +82,7 @@ module Boxlet
     end
 
     def load_config_file(path_to_config)
-      @config = symbolize_keys(YAML.load_file(path_to_config))
+      @raw_config = symbolize_keys(YAML.load_file(path_to_config))
     end
 
     def symbolize_keys(hash)
