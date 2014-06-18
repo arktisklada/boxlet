@@ -22,6 +22,7 @@ module Boxlet
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)
       if (@method == :* || request.get? && @method == :get) || (request.post? && @method == :post)
+        puts "\n#{@method.upcase} => #{@action}" if Boxlet.config[:debug]
         action_response = controller.action(@action)
         response.status = 200
       else

@@ -20,7 +20,7 @@ module Boxlet
         # default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
         host = @params.delete(:Host) || default_host
         port = @params.delete(:Port) || 8077
-        # host = '0.0.0.0'
+        host = '0.0.0.0'
         args = [host, port, app, @params]
 
         # Thin versions below 0.8.0 do not support additional options
