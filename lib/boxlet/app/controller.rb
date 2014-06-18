@@ -46,7 +46,9 @@ module Boxlet
 
     def push_files
       @format = :json
-pp @params
+      
+      pp @params if Boxlet.config[:debug]
+
       upload_path = Boxlet.config[:upload_path] || './uploads'
       upload_file = @params["file"]
       new_path = File.join(upload_path, upload_file[:filename])
