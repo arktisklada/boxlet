@@ -18,6 +18,7 @@ debug: true
 # path
 # upload_dir
 # tmp_dir
+
 db:
   development:
     host: localhost

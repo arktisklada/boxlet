@@ -71,6 +71,12 @@ module Boxlet
 
     def file_list
       @format = :json
+      # {
+      #   filename: '',
+      #   size: 0,
+      #   date: 0,
+      #   asset_path: ''
+      # }.merge
 
       db.collection('assets').find().to_a
     end
@@ -79,7 +85,12 @@ module Boxlet
       @format = :json
 
       asset_path = @params[:asset_path]
-      db.collection('assets').find({asset_path: asset_path}).to_a.first
+      {
+        filename: '',
+        size: 0,
+        date: 0,
+        asset_path: ''
+      }.merge db.collection('assets').find({asset_path: asset_path}).to_a.first
     end
 
 
