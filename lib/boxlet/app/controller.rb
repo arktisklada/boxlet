@@ -43,7 +43,12 @@ module Boxlet
       pp @params if Boxlet.config[:debug]
 
       uuid = @params["uuid"]
-
+      user = user_model.merge {uuid: [uuid]}
+      if db.collection('users').insert(user)
+        {response: true}
+      else
+        {response: false}
+      end
     end
 
     def notifications
@@ -66,7 +71,8 @@ module Boxlet
           filename: upload_file[:filename],
           size: file.size,
           date: file.mtime.to_i,
-          asset_path: @params["asset_path"]
+          asset_path: @params["asset_path"],
+          uuid: [@user[:uuid]]
         }
         db.collection('assets').insert(asset)
         {response: true}
@@ -78,14 +84,14 @@ module Boxlet
     def file_list
       @format = :json
  
-      db.collection('assets').find().to_a
+      db.collection('assets').find({uuid: @user[:uuid]}).to_a
     end
 
     def file_info
       @format = :json
 
       asset_path = @params[:asset_path]
-      file_model.merge db.collection('assets').find({asset_path: asset_path}).to_a.first || {}
+      file_model.merge db.collection('assets').find({asset_path: asset_path, uuid: @user[:uuid]}).to_a.first || {}
     end
 
 
@@ -96,7 +102,7 @@ module Boxlet
     end
 
     def set_user
-      user_model.merge db.collection('users').find.to_a.first || {}
+      user_model.merge db.collection('users').find({}).to_a.first || {}
     end
 
     def user_upload_dir
@@ -113,14 +119,15 @@ module Boxlet
         filename: '',
         size: 0,
         date: 0,
-        asset_path: ''
+        asset_path: '',
+        uuid: []
       }
     end
 
     def user_model
       {
         uuid: '',
-        notifications: 0,
+        notifications: 1,
         last_activity: Time.now
       }
     end
