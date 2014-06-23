@@ -24,6 +24,7 @@ module Boxlet
       }
     end
 
+
     def bind
       Rack::Builder.new do
         use Rack::Reloader
@@ -41,10 +42,31 @@ module Boxlet
 
 
     def setup
-      stat = Filesystem.stat(Boxlet.config[:file_system_root])
-      free_space = (stat.block_size * stat.blocks_available).to_mb
-      pp free_space
+      config = Boxlet.config
+
+      # Check for free space
+      if Boxlet::App.free_space <= 50
+        raise "Not enough free space"
+      end
+
+      # Create upload and tmp directories
+      upload_dir_name = config[:upload_dir]
+      Dir.mkdir(upload_dir_name) unless File.exists?(upload_dir_name)
+      tmp_dir_name = config[:tmp_dir]
+      Dir.mkdir(tmp_dir_name) unless File.exists?(tmp_dir_name)
+
+      if File.exists?(upload_dir_name) && File.exists?(tmp_dir_name)
+        puts "Done."
+      else
+        puts "Directories don't exist.  Please verify before running."
+      end
     end
+
+    def self.free_space
+      stat = Filesystem.stat(Boxlet.config[:file_system_root])
+      (stat.block_size * stat.blocks_available).to_mb
+    end
+
 
   end
 end

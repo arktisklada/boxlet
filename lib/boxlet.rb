@@ -20,11 +20,6 @@ module Boxlet
   def run!(argv, command='run', &blk)
     populate_params!(argv, 'config.yml')
     
-    # params[:app] = Boxlet::App.new(params).bind
-    # params[:Port] = params.delete(:port) || 8077
-    # params[:Host] = params.delete(:host) || 'localhost'
-    # Rack::Server.start(params)
-
     app = Boxlet::App.new
 
     case command
@@ -41,6 +36,11 @@ module Boxlet
   def stop!
     @runner.stop
     return app
+  end
+
+
+  def debug?
+    @config[:debug] == true ? true : false
   end
 
   def config

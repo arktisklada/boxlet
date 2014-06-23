@@ -1,16 +1,22 @@
 # Boxlet configuration file
 
-port: 8077
-host: localhost
-server_type: thin
+# Environment
 environment: development
-# daemonize: true
 debug: true
+
+# File system parameters
 # path: ./
 # upload_dir ./uploads
 # tmp_dir /tmp
 file_system_root: /
 
+# Server type and listen parameters
+port: 8077
+host: localhost
+server_type: thin
+daemonize: false
+
+# Database config
 db:
   development:
     host: localhost

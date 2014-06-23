@@ -17,10 +17,10 @@ module Boxlet
       # ported from https://github.com/rack/rack/tree/master/lib/rack/handler/thin.rb
       def start
         # environment  = ENV['RACK_ENV'] || 'development'
-        # default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
-        host = @params.delete(:Host) || default_host
+        # default_host = environment == 'development' ?  : '0.0.0.0'
+        host = @params.delete(:Host) || 'localhost'
         port = @params.delete(:Port) || 8077
-        host = '0.0.0.0'
+
         args = [host, port, @app, @params]
 
         # Thin versions below 0.8.0 do not support additional options
