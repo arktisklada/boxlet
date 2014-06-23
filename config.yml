@@ -1,23 +1,14 @@
 # Boxlet configuration file
 
-# TCP Debug mode changes logging level between WARN (false) and DEBUG (true)
-# tcp_debug: true
-
-# Server configuration
-# tcp_listen_ip: 127.0.0.1
-# tcp_listen_port: 8077
-# server_handler: thin
-
-
 port: 8077
 host: localhost
 server_type: thin
 environment: development
-# daemonize
+# daemonize: true
 debug: true
-# path
-# upload_dir
-# tmp_dir
+# path: ./
+# upload_dir ./uploads
+# tmp_dir /tmp
 file_system_root: /
 
 db:
