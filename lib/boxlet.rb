@@ -4,7 +4,7 @@ require "boxlet/version"
 require "boxlet/app"
 require "boxlet/config"
 require "boxlet/runner"
-require "pp" unless ENV['RACK_ENV'] == 'production'
+require "pp" #unless ENV['RACK_ENV'] == 'production'
 
 
 APP_ROOT = Dir.pwd
@@ -17,7 +17,7 @@ module Boxlet
 
   attr_accessor :runner, :config, :raw_params, :raw_config
 
-  def run!(argv, &blk)
+  def run!(argv, command='run', &blk)
     populate_params!(argv, 'config.yml')
     
     # params[:app] = Boxlet::App.new(params).bind
@@ -25,9 +25,16 @@ module Boxlet
     # params[:Host] = params.delete(:host) || 'localhost'
     # Rack::Server.start(params)
 
-    app = Boxlet::App.new.bind
-    @runner = Boxlet::Runner.new
-    @runner.start(app, &blk)
+    app = Boxlet::App.new
+
+    case command
+      when 'run'
+        @runner = Boxlet::Runner.new
+        @runner.start(app.bind, &blk)
+      else
+        app.send(command)
+    end
+
     return app
   end
 

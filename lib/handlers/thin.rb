@@ -21,7 +21,7 @@ module Boxlet
         host = @params.delete(:Host) || default_host
         port = @params.delete(:Port) || 8077
         host = '0.0.0.0'
-        args = [host, port, app, @params]
+        args = [host, port, @app, @params]
 
         # Thin versions below 0.8.0 do not support additional options
         args.pop if ::Thin::VERSION::MAJOR < 1 && ::Thin::VERSION::MINOR < 8

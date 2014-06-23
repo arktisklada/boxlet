@@ -6,4 +6,7 @@ Bundler.require
 
 require 'boxlet'
 
-Boxlet.run! Hash[*ARGV]
+argv = *ARGV
+command = argv.count % 2 != 0 ? argv.shift : 'run'
+
+Boxlet.run! Hash[argv], command

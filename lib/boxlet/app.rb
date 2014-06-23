@@ -1,3 +1,4 @@
+require "sys/filesystem"
 #require "rack/boxlet_url_builder"
 require "rack/request"
 require "rack/response"
@@ -8,6 +9,8 @@ require "boxlet/app/router"
 
 module Boxlet
   class App
+
+    include Sys
 
     def self.routes
       routes = {
@@ -34,6 +37,13 @@ module Boxlet
         end
         
       end.to_app
+    end
+
+
+    def setup
+      stat = Filesystem.stat(Boxlet.config[:file_system_root])
+      free_space = (stat.block_size * stat.blocks_available).to_mb
+      pp free_space
     end
 
   end
