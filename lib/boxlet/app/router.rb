@@ -18,7 +18,7 @@ module Boxlet
       request = Rack::Request.new(env)
 
       if Boxlet.debug?
-        puts "#{env["REMOTE_ADDR"]} - [#{Time.now.to_s}] #{@method.upcase} #{env["SERVER_PROTOCOL"]} => #{@action}"
+        puts "\n#{env["REMOTE_ADDR"]} - [#{Time.now.to_s}] #{@method.upcase} #{env["SERVER_PROTOCOL"]} => #{env["REQUEST_PATH"]}"
       end
 
       response = Rack::Response.new

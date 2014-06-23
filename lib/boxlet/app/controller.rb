@@ -21,6 +21,7 @@ module Boxlet
 
     def action(action)
       action_response = self.send(action)
+      set_user if action =~ /push_files|file_list|file_info/
       return {format: @format, content: action_response}
     end
 
@@ -37,7 +38,12 @@ module Boxlet
     end
 
     def register_device
-      "register_device"
+      @format = :json
+
+      pp @params if Boxlet.config[:debug]
+
+      uuid = @params["uuid"]
+
     end
 
     def notifications
@@ -49,7 +55,7 @@ module Boxlet
       
       pp @params if Boxlet.config[:debug]
 
-      upload_path = Boxlet.config[:upload_path] || './uploads'
+      upload_path = user_upload_dir || './uploads'
       upload_file = @params["file"]
       new_path = File.join(upload_path, upload_file[:filename])
       FileUtils.mv(upload_file[:tempfile].path, new_path)
@@ -71,13 +77,7 @@ module Boxlet
 
     def file_list
       @format = :json
-      # {
-      #   filename: '',
-      #   size: 0,
-      #   date: 0,
-      #   asset_path: ''
-      # }.merge
-
+ 
       db.collection('assets').find().to_a
     end
 
@@ -85,12 +85,7 @@ module Boxlet
       @format = :json
 
       asset_path = @params[:asset_path]
-      {
-        filename: '',
-        size: 0,
-        date: 0,
-        asset_path: ''
-      }.merge db.collection('assets').find({asset_path: asset_path}).to_a.first
+      file_model.merge db.collection('assets').find({asset_path: asset_path}).to_a.first || {}
     end
 
 
@@ -98,6 +93,36 @@ module Boxlet
 
     def db
       Boxlet::Db.connection
+    end
+
+    def set_user
+      user_model.merge db.collection('users').find.to_a.first || {}
+    end
+
+    def user_upload_dir
+      user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + @user.uuid
+      Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
+      user_upload_dir_name
+    end
+
+
+    # Models
+
+    def file_model
+      {
+        filename: '',
+        size: 0,
+        date: 0,
+        asset_path: ''
+      }
+    end
+
+    def user_model
+      {
+        uuid: '',
+        notifications: 0,
+        last_activity: Time.now
+      }
     end
 
   end
