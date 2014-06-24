@@ -9,4 +9,4 @@ require 'boxlet'
 argv = *ARGV
 command = argv.count % 2 != 0 ? argv.shift : 'run'
 
-Boxlet.run! Hash[argv], command
+Boxlet.run! Hash[*argv], command

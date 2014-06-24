@@ -22,6 +22,7 @@ module Boxlet
     def action(action)
       action_response = self.send(action)
       set_user if action =~ /push_files|file_list|file_info/
+      
       return {format: @format, content: action_response}
     end
 
@@ -32,34 +33,34 @@ module Boxlet
       '<html><body><form action="/push_files" method="post" enctype="multipart/form-data"><input type="file" name="file"><input type="submit"></form>'
     end
 
-    def auth
-      @format = :json
-      "auth"
-    end
+    # def auth
+    #   @format = :json
+    #   "auth"
+    # end
 
-    def register_device
-      @format = :json
+    # def register_device
+    #   @format = :json
 
-      pp @params if Boxlet.config[:debug]
+    #   pp @params if Boxlet.config[:debug]
 
-      uuid = @params[:uuid]
-      # user = user_model.merge { uuid: uuid }
-      if db.collection('users').insert(user)
-        {response: true}
-      else
-        {response: false}
-      end
-    end
+    #   uuid = @params[:uuid]
+    #   # user = user_model.merge { uuid: uuid }
+    #   if db.collection('users').insert(user)
+    #     {response: true}
+    #   else
+    #     {response: false}
+    #   end
+    # end
 
-    def notifications
-      @format = :json
+    # def notifications
+    #   @format = :json
 
-      uuid = @params[:uuid]
-      notifications = @params[:notifications]
-      pp uuid
-      # @user
-      "notifications"
-    end
+    #   uuid = @params[:uuid]
+    #   notifications = @params[:notifications]
+    #   pp uuid
+    #   # @user
+    #   "notifications"
+    # end
 
     def push_files
       @format = :json
@@ -98,7 +99,7 @@ module Boxlet
 
       uuid = @params[:uuid]
       asset_path = @params[:asset_path]
-      file_model.merge db.collection('assets').find({asset_path: asset_path}).to_a.first || {}
+      file_model.merge db.collection('assets').find({asset_path: asset_path, uuid: uuid}).to_a.first || {}
     end
 
 

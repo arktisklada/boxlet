@@ -48,7 +48,8 @@ module Boxlet
     def populate_params!(argv, path_to_config=nil)
       @raw_config = load_config_file(path_to_config) unless path_to_config == nil
       @raw_params = parse_arguments(argv)
-      @config = @raw_params.merge(@raw_config)
+      # @config = @raw_params.merge(@raw_config)
+      @config = @raw_config.merge(@raw_params)
       if @config[:debug]
         pp @config
       end
@@ -71,7 +72,7 @@ module Boxlet
                       (config_value.nil? ? nil : config_value) ||
                       (default.is_a?(Proc) ? default.call : default)
 
-        ( param_value = sanitizer.call( param_value ) ) if sanitizer.is_a? Proc
+        param_value = sanitizer.call(param_value) if sanitizer.is_a?(Proc)
 
         if !param_value.nil?
           params[param_name] = param_value
