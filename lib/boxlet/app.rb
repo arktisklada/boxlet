@@ -17,7 +17,7 @@ module Boxlet
         ["/", :get]                 => :index,
         ["/auth"]                   => :auth,
         ["/register_device", :post] => :register_device,
-        ["/notifications", :post]   => :notifications,
+        ["/notifications", :*]   => :notifications,
         ["/push_files", :post]      => :push_files,
         ["/file_list"]              => :file_list,
         ["/file_info"]              => :file_info
