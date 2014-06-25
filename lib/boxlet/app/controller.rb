@@ -15,7 +15,9 @@ module Boxlet
 
     def initialize(request)
       @request = request
-      @params = request.params
+      @params = Boxlet.symbolize_keys request.params
+      pp request.params
+
       @format = :html
     end
 
@@ -30,7 +32,7 @@ module Boxlet
     # actions
 
     def index
-      '<html><body><form action="/push_files" method="post" enctype="multipart/form-data"><input type="file" name="file"><input type="submit"></form>'
+      '<html><body><form action="/push_files" method="post" enctype="multipart/form-data">UUID:<input type="text" name="uuid"><br><input type="file" name="file"><input type="submit"></form>'
     end
 
     # def auth
@@ -65,11 +67,13 @@ module Boxlet
     def push_files
       @format = :json
       
-      pp @params if Boxlet.config[:debug]
-
       upload_path = user_upload_dir || './uploads'
-      upload_file = @params["file"]
-      new_path = File.join(upload_path, upload_file[:filename])
+      upload_file = @params[:file]
+      asset_path = @params[:asset_path]
+      asset_path_params = Rack::Utils.parse_nested_query(asset_path[asset_path.index('?') + 1..-1])
+
+      new_filename = "#{asset_path_params["id"]}.#{asset_path_params["ext"]}"
+      new_path = File.join(upload_path, new_filename)
       FileUtils.mv(upload_file[:tempfile].path, new_path)
 
       if File.exists? File.join(upload_path, upload_file[:filename])
@@ -114,7 +118,7 @@ module Boxlet
     end
 
     def user_upload_dir
-      user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + (@user.uuid || '')
+      user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + (@params[:uuid] || '')
       Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
       user_upload_dir_name
     end

@@ -50,11 +50,23 @@ module Boxlet
       @raw_params = parse_arguments(argv)
       # @config = @raw_params.merge(@raw_config)
       @config = @raw_config.merge(@raw_params)
+
+      @config[:debug] = @raw_config[:debug] || @raw_params[:debug]
       if @config[:debug]
         pp @config
       end
     end
 
+
+    def symbolize_keys(hash)
+      hash.inject({}){|result, (key, value)|
+        new_key = key.instance_of?(String) ? key.to_sym : key
+        new_value = value.instance_of?(Hash) ? symbolize_keys(value) : value
+
+        result[new_key] = new_value
+        result
+      }
+    end
 
     private
 
@@ -86,15 +98,6 @@ module Boxlet
       @raw_config = symbolize_keys(YAML.load_file(path_to_config))
     end
 
-    def symbolize_keys(hash)
-      hash.inject({}){|result, (key, value)|
-        new_key = key.instance_of?(String) ? key.to_sym : key
-        new_value = value.instance_of?(Hash) ? symbolize_keys(value) : value
-
-        result[new_key] = new_value
-        result
-      }
-    end
   end
 
   
