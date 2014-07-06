@@ -76,8 +76,8 @@ module Boxlet
       new_path = File.join(upload_path, new_filename)
       FileUtils.mv(upload_file[:tempfile].path, new_path)
 
-      if File.exists? File.join(upload_path, upload_file[:filename])
-        file = File.open(File.join(upload_path, upload_file[:filename]), 'r')
+      if File.exists? new_path
+        file = File.open(new_path, 'r')
         asset = {
           filename: upload_file[:filename],
           size: file.size,
@@ -94,8 +94,9 @@ module Boxlet
 
     def file_list
       @format = :json
- 
-      db.collection('assets').find({uuid: @params[:uuid]}).to_a
+
+      uuid = @params[:uuid]
+      db.collection('assets').find({uuid: uuid}).to_a
     end
 
     def file_info
