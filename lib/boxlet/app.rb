@@ -65,6 +65,10 @@ module Boxlet
 
 
     def self.free_space
+      self.app_space_capacity - self.app_space_usage
+    end
+
+    def self.app_space_capacity
       drive_free_space = self.drive_free_space
       if Boxlet.config[:capacity].is_a? String
         drive_free_space * Boxlet.config[:capacity].to_i / 100
@@ -73,7 +77,7 @@ module Boxlet
       end
     end
 
-    def self.app_usage
+    def self.app_space_usage
       raise RuntimeError, "#{Boxlet.config[:upload_dir]} is not a directory" unless File.directory?(Boxlet.config[:upload_dir])
 
       total_size = 0
