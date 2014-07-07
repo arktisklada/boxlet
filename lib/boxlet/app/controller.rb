@@ -64,6 +64,15 @@ module Boxlet
     #   "notifications"
     # end
 
+    def stats
+      @format = :json
+      
+      {
+        free_space: Boxlet::App.free_space,
+        usage: Boxlet::App.app_usage
+      }
+    end
+
     def push_files
       @format = :json
       
@@ -122,6 +131,12 @@ module Boxlet
       user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + (@params[:uuid] || '')
       Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
       user_upload_dir_name
+    end
+
+    def free_space?
+      free_space = Boxlet::App.free_space
+      if free_space < 50 || free_space < Boxlet.config[:capacity]
+      end
     end
 
 

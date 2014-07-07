@@ -15,9 +15,10 @@ module Boxlet
     def self.routes
       routes = {
         ["/", :get]                 => :index,
-        ["/auth"]                   => :auth,
-        ["/register_device", :post] => :register_device,
-        ["/notifications", :*]   => :notifications,
+        # ["/auth"]                   => :auth,
+        # ["/register_device", :post] => :register_device,
+        # ["/notifications", :*]   => :notifications,
+        ["/stats", :get]            => :stats,
         ["/push_files", :post]      => :push_files,
         ["/file_list"]              => :file_list,
         ["/file_info"]              => :file_info
@@ -62,9 +63,34 @@ module Boxlet
       end
     end
 
+
     def self.free_space
+      drive_free_space = self.drive_free_space
+      if Boxlet.config[:capacity].is_a? String
+        drive_free_space * Boxlet.config[:capacity].to_i / 100
+      else
+        drive_free_space
+      end
+    end
+
+    def self.app_usage
+      raise RuntimeError, "#{Boxlet.config[:upload_dir]} is not a directory" unless File.directory?(Boxlet.config[:upload_dir])
+
+      total_size = 0
+      Dir["#{Boxlet.config[:upload_dir]}/**/*"].each do |f|
+        total_size += File.size(f) if File.file?(f) && File.size?(f)
+      end
+      total_size / 1000000 # / 1048576 # to megabytes
+    end
+
+    def self.drive_free_space
       stat = Filesystem.stat(Boxlet.config[:file_system_root])
       (stat.block_size * stat.blocks_available).to_mb
+    end
+
+    def self.drive_capacity
+      stat = Filesystem.stat(Boxlet.config[:file_system_root])
+      (stat.block_size * stat.blocks).to_mb
     end
 
 

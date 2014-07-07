@@ -10,6 +10,9 @@ debug: true
 # tmp_dir /tmp
 file_system_root: /
 
+# Capacity is either a percentage of available space on the drive or number in MB
+capacity: 90%
+
 # Server type and listen parameters
 port: 8077
 host: localhost
