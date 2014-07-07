@@ -18,7 +18,7 @@ module Boxlet
         # ["/auth"]                   => :auth,
         # ["/register_device", :post] => :register_device,
         # ["/notifications", :*]   => :notifications,
-        ["/stats", :get]            => :stats,
+        ["/stats", :post]           => :stats,
         ["/push_files", :post]      => :push_files,
         ["/file_list"]              => :file_list,
         ["/file_info"]              => :file_info
@@ -37,7 +37,7 @@ module Boxlet
             run Boxlet::Router.new(route[1] || :*, action)
           end
         end
-        
+
       end.to_app
     end
 
@@ -48,6 +48,9 @@ module Boxlet
       # Check for free space
       if Boxlet::App.free_space <= 50
         raise "Not enough free space"
+      end
+      if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
+        puts "App is over 90% full"
       end
 
       # Create upload and tmp directories
@@ -63,6 +66,8 @@ module Boxlet
       end
     end
 
+
+    # App disk space functions
 
     def self.free_space
       self.app_space_capacity - self.app_space_usage
@@ -86,6 +91,8 @@ module Boxlet
       end
       total_size / 1000000 # / 1048576 # to megabytes
     end
+
+    # Drive disk space functions
 
     def self.drive_free_space
       stat = Filesystem.stat(Boxlet.config[:file_system_root])
