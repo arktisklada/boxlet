@@ -25,6 +25,11 @@ module Boxlet
       }
     end
 
+    def initialize
+      usage = Boxlet::App.app_space_usage
+      capacity = Boxlet::App.app_space_capacity
+      puts "Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)"
+    end
 
     def bind
       Rack::Builder.new do
@@ -70,15 +75,15 @@ module Boxlet
     # App disk space functions
 
     def self.free_space
-      self.app_space_capacity - self.app_space_usage
+      Boxlet::App.app_space_capacity - Boxlet::App.app_space_usage
     end
 
     def self.app_space_capacity
-      drive_free_space = self.drive_free_space
+      drive_free_space = Boxlet::App.drive_free_space
       if Boxlet.config[:capacity].is_a? String
-        drive_free_space * Boxlet.config[:capacity].to_i / 100
+        Boxlet::App.drive_free_space * Boxlet.config[:capacity].to_i / 100
       else
-        drive_free_space
+        Boxlet.config[:capacity]
       end
     end
 
