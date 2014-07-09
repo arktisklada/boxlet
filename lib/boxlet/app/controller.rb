@@ -1,3 +1,5 @@
+require 'date'
+
 # routes = {
 #   ["/", :get]                 => :index,
 #   ["/auth"]                   => :auth,
@@ -88,11 +90,13 @@ module Boxlet
 
       if File.exists? new_path
         file = File.open(new_path, 'r')
+        # asset_date = Date.parse(@params[:asset_date])
         asset = {
           filename: upload_file[:filename],
           size: file.size,
-          date: file.mtime.to_i,
+          local_date: file.mtime.to_i,
           asset_path: @params[:asset_path],
+          asset_date: @params[:asset_date],
           uuid: @params[:uuid]
         }
         db.collection('assets').insert(asset)
@@ -146,8 +150,9 @@ module Boxlet
       {
         filename: '',
         size: 0,
-        date: 0,
+        local_date: 0,
         asset_path: '',
+        asset_date: '',
         uuid: []
       }
     end
