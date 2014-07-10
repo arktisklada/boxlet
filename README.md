@@ -1,6 +1,6 @@
 # Boxlet
 
-Boxlet is a server + mobile app system that allows you to take advantage of free space on any cloud server you may have ssh access to.
+Boxlet is a server + mobile app system that allows you to take advantage of free space on any cloud server you have ssh access to as a backup/sync for your photos.
 
 From the mobile iOS app, you can specify any server:port where the Boxlet server is running to sync and backup your photos to a remote server.
 
