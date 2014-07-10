@@ -47,27 +47,46 @@ module Boxlet
     end
 
 
-    def setup
-      config = Boxlet.config
+    def setup(config)
+      begin
+        # Check for free space
+        if Boxlet::App.free_space <= 50
+          raise "Not enough free space"
+        end
+        if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
+          puts "App is over 90% full"
+        end
 
-      # Check for free space
-      if Boxlet::App.free_space <= 50
-        raise "Not enough free space"
-      end
-      if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
-        puts "App is over 90% full"
-      end
+        # Create upload and tmp directories
+        upload_dir = Boxlet.config[:upload_dir]
+        tmp_dir = Boxlet.config[:tmp_dir]
+        if !File.exists?(upload_dir) || !File.exists?(tmp_dir)
+          if !File.exists?(upload_dir)
+            puts "Upload directory (#{upload_dir}) does not exist.  Create? [y/n]"
+            create = gets.chomp
+            if create =~ /y/i
+              Dir.mkdir(upload_dir)
+              puts "Upload directory created!"
+            end
+          end
+          if !File.exists?(tmp_dir)
+            puts "Temp directory (#{tmp_dir}) does not exist.  Create? [y/n]"
+            create = gets.chomp
+            if create =~ /y/i
+              Dir.mkdir(tmp_dir)
+              puts "Temp directory created!"
+            end
+          end
+          if File.exists?(upload_dir) && File.exists?(tmp_dir)
+            puts "Done creating directories."
+          else
+            raise "Error creating directories.  Please check your config and file permissions, and retry."
+          end
+        end
 
-      # Create upload and tmp directories
-      upload_dir_name = config[:upload_dir]
-      Dir.mkdir(upload_dir_name) unless File.exists?(upload_dir_name)
-      tmp_dir_name = config[:tmp_dir]
-      Dir.mkdir(tmp_dir_name) unless File.exists?(tmp_dir_name)
-
-      if File.exists?(upload_dir_name) && File.exists?(tmp_dir_name)
-        puts "Done."
-      else
-        puts "Directories don't exist.  Please verify before running."
+        puts "\nBoxlet setup is done!"
+      rescue => e
+        puts "\nERROR: #{e}"
       end
     end
 

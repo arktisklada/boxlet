@@ -17,8 +17,8 @@ module Boxlet
 
   attr_accessor :runner, :config, :raw_params, :raw_config
 
-  def run!(argv, command='run', &blk)
-    populate_params!(argv, 'config.yml')
+  def run!(argv, command='run', config_file='config.yml', &blk)
+    populate_params!(argv, config_file)
     
     app = Boxlet::App.new
 
@@ -27,15 +27,15 @@ module Boxlet
         @runner = Boxlet::Runner.new
         @runner.start(app.bind, &blk)
       else
-        app.send(command)
+        app.send(command, Boxlet.config)
     end
 
-    return app
+    app
   end
 
   def stop!
     @runner.stop
-    return app
+    app
   end
 
 

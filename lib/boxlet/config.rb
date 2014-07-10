@@ -26,12 +26,12 @@ module Boxlet
       },
       :daemonize => {
         :short      => 'D',
-        :default    => false,
+        :default    => 'false',
         :sanitizer  => Proc.new { |p| p == 'true' }
       },
       :debug => {
         :short      => 'd',
-        :default    => false,
+        :default    => 'true',
         :sanitizer  => Proc.new { |p| p == 'true' }
       },
       :upload_dir => {
@@ -41,12 +41,21 @@ module Boxlet
       :tmp_dir => {
         :short      => 'T',
         :default    => './tmp'
+      },
+      :file_system_root => {
+        :short      => 'r',
+        :default    => '/'
+      },
+      :capacity => {
+        :short      => 'C',
+        :default    => '90%',
+        :sanitizer  => Proc.new { |p| (p.to_i.to_s == p) ? p.to_i : p }
       }
     }
 
 
-    def populate_params!(argv, path_to_config=nil)
-      @raw_config = load_config_file(path_to_config) unless path_to_config == nil
+    def populate_params!(argv, path_to_config)
+      @raw_config = load_config_file(path_to_config)
       @raw_params = parse_arguments(argv)
       # @config = @raw_params.merge(@raw_config)
       @config = @raw_config.merge(@raw_params)
@@ -95,7 +104,13 @@ module Boxlet
     end
 
     def load_config_file(path_to_config)
-      @raw_config = symbolize_keys(YAML.load_file(path_to_config))
+      begin
+        loaded_config = YAML.load_file(path_to_config)
+        symbolize_keys(loaded_config)
+      rescue
+        puts "Error loading config file!  Using defaults..."
+        {}
+      end
     end
 
   end

@@ -27,7 +27,7 @@ module Boxlet
       action_response = self.send(action)
       set_user if action =~ /push_files|file_list|file_info/
       
-      return {format: @format, content: action_response}
+      {format: @format, content: action_response}
     end
 
 
@@ -139,8 +139,7 @@ module Boxlet
     end
 
     def free_space?
-      free_space = Boxlet::App.free_space
-      return free_space > 50
+      Boxlet::App.free_space > 50
     end
 
 

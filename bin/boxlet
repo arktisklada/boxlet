@@ -1,12 +1,15 @@
 #!/usr/bin/env ruby
-require "bundler"
-Bundler.setup
-Bundler.require
-
 
 require 'boxlet'
 
 argv = *ARGV
 command = argv.count % 2 != 0 ? argv.shift : 'run'
+argv_hash = Hash[*argv]
 
-Boxlet.run! Hash[*argv], command
+config = argv_hash["-c"] || argv_hash["--config"]
+if !config
+  puts "WARNING: config file not specified, looking in current directory..."
+  config = 'config.yml'
+end
+
+Boxlet.run! argv_hash, command, config

@@ -6,12 +6,12 @@ debug: true
 
 # File system parameters
 # path: ./
-# upload_dir ./uploads
-# tmp_dir /tmp
-file_system_root: /
+# upload_dir: ./uploads
+# tmp_dir: /tmp
+# file_system_root: /
 
 # Capacity is either a percentage of available space on the drive or number in MB
-capacity: 900
+capacity: 90%
 
 # Server type and listen parameters
 port: 8077
