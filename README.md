@@ -1,24 +1,97 @@
 # Boxlet
 
-TODO: Write a gem description
+Boxlet is a server + mobile app system that allows you to take advantage of free space on any cloud server you may have ssh access to.
+
+From the mobile iOS app, you can specify any server:port where the Boxlet server is running to sync and backup your photos to a remote server.
+
+
+## Dependencies
+
+- Ruby 2.0+ (Has been tested in 2.0 and 2.1.1)
+- MongoDB 2.4+
+- Linux server with free drive space and an open port
+- iOS 7.1 (iPhone app)
+
 
 ## Installation
 
-Add this line to your application's Gemfile:
+`gem install boxlet`
 
-    gem 'boxlet'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install boxlet
 
 ## Usage
 
-TODO: Write usage instructions here
+Run `boxlet` from any folder to stat the server with default settings.
+
+See below for config and parameters.
+
+
+## Config
+
+Here's a sample Boxlet configuration file `config.yml` with default values populated:
+
+```yml
+# config.yml
+
+# Environment
+environment: development
+debug: true
+
+# File system parameters
+path: ./
+upload_dir: ./uploads
+tmp_dir: /tmp
+file_system_root: /
+
+# Capacity is either a percentage of available space on the drive or number in MB
+capacity: 90%
+
+# Server type and listen parameters
+port: 8077
+host: localhost
+server_type: thin
+daemonize: false
+
+# Database config
+db:
+  development:
+    host: localhost
+    db: boxlet_dev
+  production:
+    host: localhost
+    # port:
+    # user:
+    # pass:
+    db: boxlet
+
+```
+
+All config options are available as command-line parameters
+
+- Path: `-f` or `--path`
+  - Default: `./`
+- Port: `-p` or `--port`
+  - Default: `8077`
+- Host: `-o` or `--host`
+  - Default: `localhost`
+  - Public: `0.0.0.0`
+- Server Type: `-s` or `--server_type`
+  - Default: `rack`
+- Environment: `-E` or `--environment`
+  - Default: `development`
+- Daemonize: `-D` or `--daemonize`
+  - Default: `false`
+- Debug: `-d` or `--debug`
+  - Default: `true`
+- Upload Directory: `-U` or `--upload_dir`
+  - Default: `./uploads`
+- Temp Directory: `-T` or `--tmp_dir`
+  - Default: `./tmp`
+- File System Root: `-r` or `--file_system_root`
+  - Default: `/`
+- Capacity: `-C` or `--capacity`
+  - Default: `90%`
+
+
 
 ## Contributing
 
