@@ -34,15 +34,17 @@ module Boxlet
     def bind
       Rack::Builder.new do
         use Rack::Reloader
-        # use Rack::Static, :urls => ["/public"]
-        use Rack::FileUpload, :upload_dir => [Boxlet.config[:upload_dir] || APP_ROOT + '/uploads']
+        use Rack::FileUpload, :upload_dir => [Boxlet.config[:upload_dir] || APP_ROOT + "/uploads"]
+        use Rack::Static, :urls => ["/uploads"]
 
+        # map "/uploads" do
+        #   run Rack::File.new(Boxlet.config[:upload_dir])
+        # end
         Boxlet::App.routes.each do |route, action|
           map route[0] do
             run Boxlet::Router.new(route[1] || :*, action)
           end
         end
-
       end.to_app
     end
 

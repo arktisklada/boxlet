@@ -92,7 +92,7 @@ module Boxlet
         file = File.open(new_path, 'r')
         # asset_date = Date.parse(@params[:asset_date])
         asset = {
-          filename: upload_file[:filename],
+          filename: new_filename,
           size: file.size,
           local_date: file.mtime.to_i,
           asset_path: @params[:asset_path],
