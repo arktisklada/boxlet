@@ -141,7 +141,8 @@ module Boxlet
       if @params[:uuid]
         dir_shortname = Digest::MD5.hexdigest(dir_name)
         user_upload_dir_shortname = Boxlet.config[:upload_dir] + "/" + dir_shortname
-        File.symlink(dir_name, user_upload_dir_shortname)
+
+        File.symlink(dir_name, user_upload_dir_shortname) if !File.symlink? user_upload_dir_shortname
 
         if File.symlink? user_upload_dir_shortname
           user_upload_dir_shortname
