@@ -14,21 +14,24 @@ module Boxlet
 
     def self.routes
       routes = {
-        ["/", :get]                 => :index,
+        # ["/", :get]                 => :index,
         # ["/auth"]                   => :auth,
         # ["/register_device", :post] => :register_device,
         # ["/notifications", :*]   => :notifications,
         ["/stats", :post]           => :stats,
         ["/push_files", :post]      => :push_files,
         ["/file_list"]              => :file_list,
-        ["/file_info"]              => :file_info
+        ["/file_info"]              => :file_info,
+        ["/resync", :get]           => :resync
       }
     end
 
     def initialize
-      usage = Boxlet::App.app_space_usage
-      capacity = Boxlet::App.app_space_capacity
-      puts "Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)"
+      if Boxlet.debug?
+        usage = Boxlet::App.app_space_usage
+        capacity = Boxlet::App.app_space_capacity
+        puts "Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)"
+      end
     end
 
     def bind
@@ -37,9 +40,6 @@ module Boxlet
         use Rack::FileUpload, :upload_dir => [Boxlet.config[:upload_dir] || APP_ROOT + "/uploads"]
         use Rack::Static, :urls => ["/uploads"]
 
-        # map "/uploads" do
-        #   run Rack::File.new(Boxlet.config[:upload_dir])
-        # end
         Boxlet::App.routes.each do |route, action|
           map route[0] do
             run Boxlet::Router.new(route[1] || :*, action)

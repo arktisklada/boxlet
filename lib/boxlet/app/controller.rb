@@ -122,6 +122,16 @@ module Boxlet
       file_model.merge db.collection('assets').find({asset_path: asset_path, uuid: uuid}).to_a.first || {}
     end
 
+    def resync
+      upload_dir = user_upload_dir || './uploads'
+      db.collection('assets').find().each do |a|
+        asset_path = a["uuid"] + "/" + a["filename"]
+        if !File.exists? upload_dir + "/" + asset_path
+          db.collection('assets').remove({"_id" => a["_id"]})
+        end
+      end
+    end
+
 
     private
 
