@@ -2,6 +2,10 @@ module Boxlet
   module Config
 
     ARGS  = {
+      :environment => {
+        :short      => 'E',
+        :default    => 'development'
+      },
       :path => {
         :short      => 'f',
         :default    => Proc.new { Dir.pwd }
@@ -20,19 +24,15 @@ module Boxlet
         :default    => 'rack',
         :sanitizer  => Proc.new { |p| p.to_sym }
       },
-      :environment => {
-        :short      => 'E',
-        :default    => 'development'
-      },
       :daemonize => {
-        :short      => 'D',
+        :short      => 'd',
         :default    => 'false',
-        :sanitizer  => Proc.new { |p| p == 'true' }
+        :sanitizer  => Proc.new { |p| p == true || p == 'true' }
       },
       :debug => {
-        :short      => 'd',
+        :short      => 'D',
         :default    => 'true',
-        :sanitizer  => Proc.new { |p| p == 'true' }
+        :sanitizer  => Proc.new { |p| p == true ||  p == 'true' }
       },
       :upload_dir => {
         :short      => 'U',
@@ -50,6 +50,14 @@ module Boxlet
         :short      => 'C',
         :default    => '90%',
         :sanitizer  => Proc.new { |p| (p.to_i.to_s == p) ? p.to_i : p }
+      },
+      :pid_file => {
+        :short      => 'P',
+        :default    => Proc.new { Dir.pwd + "/server.pid" }
+      },
+      :log_file => {
+        :short      => 'L',
+        :default    => Proc.new { Dir.pwd + "/server.log" }
       }
     }
 
@@ -57,8 +65,8 @@ module Boxlet
     def populate_params!(argv, path_to_config)
       @raw_config = load_config_file(path_to_config)
       @raw_params = parse_arguments(argv)
-      # @config = @raw_params.merge(@raw_config)
-      @config = @raw_config.merge(@raw_params)
+
+      @config = @raw_params
 
       @config[:debug] = @raw_config[:debug] || @raw_params[:debug]
       if @config[:debug]
@@ -80,7 +88,8 @@ module Boxlet
     private
 
     def parse_arguments(argv)
-      params = Hash.new
+      # params = Hash.new
+      params = @raw_config
 
       ARGS.each_pair do |param_name, param_attrs|
         param_short_name = param_attrs[:short]

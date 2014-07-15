@@ -19,7 +19,6 @@ module Boxlet
 
   def run!(argv, command='run', config_file='config.yml', &blk)
     populate_params!(argv, config_file)
-    
     app = Boxlet::App.new
 
     case command
