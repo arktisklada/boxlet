@@ -26,15 +26,13 @@ module Boxlet
       }
     end
 
-    def initialize
+    def bind
       if Boxlet.debug?
         usage = Boxlet::App.app_space_usage
         capacity = Boxlet::App.app_space_capacity
         puts "Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)"
       end
-    end
 
-    def bind
       Rack::Builder.new do
         use Rack::Reloader
         use Rack::FileUpload, :upload_dir => [Boxlet.config[:upload_dir] || APP_ROOT + "/uploads"]
@@ -51,39 +49,33 @@ module Boxlet
 
     def setup(config)
       begin
-        # Check for free space
-        if Boxlet::App.free_space <= 50
-          raise "Not enough free space"
-        end
-        if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
-          puts "App is over 90% full"
-        end
-
         # Create upload and tmp directories
         upload_dir = Boxlet.config[:upload_dir]
         tmp_dir = Boxlet.config[:tmp_dir]
         if !File.exists?(upload_dir) || !File.exists?(tmp_dir)
           if !File.exists?(upload_dir)
-            puts "Upload directory (#{upload_dir}) does not exist.  Create? [y/n]"
-            create = gets.chomp
-            if create =~ /y/i
-              Dir.mkdir(upload_dir)
-              puts "Upload directory created!"
-            end
+            puts "Upload directory (#{upload_dir}) does not exist.  Creating..."
+            Dir.mkdir(upload_dir)
+            puts "Upload directory created!"
           end
           if !File.exists?(tmp_dir)
-            puts "Temp directory (#{tmp_dir}) does not exist.  Create? [y/n]"
-            create = gets.chomp
-            if create =~ /y/i
-              Dir.mkdir(tmp_dir)
-              puts "Temp directory created!"
-            end
+            puts "Temp directory (#{tmp_dir}) does not exist.  Creating..."
+            Dir.mkdir(tmp_dir)
+            puts "Temp directory created!"
           end
           if File.exists?(upload_dir) && File.exists?(tmp_dir)
             puts "Done creating directories."
           else
             raise "Error creating directories.  Please check your config and file permissions, and retry."
           end
+        end
+
+        # Check for free space
+        if Boxlet::App.free_space <= 50
+          raise "Not enough free space"
+        end
+        if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
+          puts "App is over 90% full"
         end
 
         puts "\nBoxlet setup is done!"
