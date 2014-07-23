@@ -29,7 +29,7 @@ module Boxlet
         response.status = 200
       else
         response.status = 404
-        raise "404"
+        action_response[:content] = "404 not found"
       end
 
       if action_response[:format] == :json
