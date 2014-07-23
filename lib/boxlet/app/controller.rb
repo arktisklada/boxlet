@@ -89,6 +89,11 @@ module Boxlet
       new_path = File.join(upload_path, new_filename)
       FileUtils.mv(upload_file[:tempfile].path, new_path)
 
+      new_thumb_filename = "#{asset_path_params["id"]}-thumb.#{asset_path_params["ext"]}"
+      new_thumb_path = File.join(upload_path, new_filename)
+      Image.resize(new_path, new_thumb_path, 150, 150)
+      # FileUtils.cp(new_path, new_thumb_path)
+
       if File.exists? new_path
         file = File.open(new_path, 'r')
         # asset_date = Date.parse(@params[:asset_date])
@@ -96,6 +101,7 @@ module Boxlet
           filename: new_filename,
           size: file.size,
           local_date: file.mtime.to_i,
+          thumbnail: new_thumb_filename,
           asset_path: @params[:asset_path],
           asset_date: @params[:asset_date],
           uuid: @params[:uuid]
@@ -176,6 +182,7 @@ module Boxlet
         filename: '',
         size: 0,
         local_date: 0,
+        thumbnail: '',
         asset_path: '',
         asset_date: '',
         uuid: []
