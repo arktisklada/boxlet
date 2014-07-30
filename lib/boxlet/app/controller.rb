@@ -1,5 +1,7 @@
 require 'date'
 require 'digest'
+require 'thread'
+require 'ImageResize'
 
 # routes = {
 #   ["/", :get]                 => :index,
@@ -90,8 +92,7 @@ module Boxlet
       FileUtils.mv(upload_file[:tempfile].path, new_path)
 
       new_thumb_filename = "#{asset_path_params["id"]}-thumb.#{asset_path_params["ext"]}"
-      new_thumb_path = File.join(upload_path, new_filename)
-      Image.resize(new_path, new_thumb_path, 150, 150)
+      new_thumb_path = File.join(upload_path, new_thumb_filename)
       # FileUtils.cp(new_path, new_thumb_path)
 
       if File.exists? new_path
@@ -107,6 +108,11 @@ module Boxlet
           uuid: @params[:uuid]
         }
         db.collection('assets').insert(asset)
+
+        t = Thread.new do
+          Image.resize(new_path, new_thumb_path, 150, 150)
+        end
+
         {response: true}
       else
         {response: false}

@@ -35,7 +35,8 @@ module Boxlet
 
       Rack::Builder.new do
         use Rack::Reloader
-        use Rack::FileUpload, :upload_dir => [Boxlet.config[:upload_dir] || APP_ROOT + "/uploads"]
+        # use Rack::FileUpload, :upload_dir => [Boxlet.config[:upload_dir] || APP_ROOT + "/uploads"]
+        use Rack::FileUpload, Boxlet.config
         use Rack::Static, :urls => ["/uploads"]
 
         Boxlet::App.routes.each do |route, action|
