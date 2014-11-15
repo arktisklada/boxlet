@@ -113,6 +113,21 @@ module Boxlet
           Image.resize(new_path, new_thumb_path, 150, 150)
         end
 
+        if Boxlet.config.s3
+          t = Thread.new do
+            s3 = AWS::S3.new(
+              :access_key_id => Boxlet.config.s3.access_key_id,
+              :secret_access_key => Boxlet.config.s3.secret_access_key
+            )
+            s3.buckets[Boxlet.config.s3.bucket]
+              .objects["#{upload_path.split('/').reject(&:blank?).last}/#{new_filename}"]
+              .write(:file => new_path)
+            s3.buckets[Boxlet.config.s3.bucket]
+              .objects["#{upload_path.split('/').reject(&:blank?).last}/#{new_thumb_filename}"]
+              .write(:file => new_thumb_path)
+          end
+        end
+
         {response: true}
       else
         {response: false}
