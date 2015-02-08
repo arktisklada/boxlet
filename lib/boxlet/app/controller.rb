@@ -2,6 +2,7 @@ require 'date'
 require 'digest'
 require 'thread'
 require 'ImageResize'
+require 'aws-sdk'
 
 # routes = {
 #   ["/", :get]                 => :index,
@@ -111,20 +112,27 @@ module Boxlet
 
         t = Thread.new do
           Image.resize(new_path, new_thumb_path, 150, 150)
-        end
 
-        if Boxlet.config.s3
-          t = Thread.new do
+          if Boxlet.config[:s3][:enabled]
+            pp 'Uploading to S3...' if Boxlet.config[:debug]
+
             s3 = AWS::S3.new(
-              :access_key_id => Boxlet.config.s3.access_key_id,
-              :secret_access_key => Boxlet.config.s3.secret_access_key
+              :access_key_id => Boxlet.config[:s3][:access_key_id],
+              :secret_access_key => Boxlet.config[:s3][:secret_access_key]
             )
-            s3.buckets[Boxlet.config.s3.bucket]
-              .objects["#{upload_path.split('/').reject(&:blank?).last}/#{new_filename}"]
-              .write(:file => new_path)
-            s3.buckets[Boxlet.config.s3.bucket]
-              .objects["#{upload_path.split('/').reject(&:blank?).last}/#{new_thumb_filename}"]
-              .write(:file => new_thumb_path)
+            if s3.buckets[Boxlet.config[:s3][:bucket]]
+                .objects["#{@params[:uuid]}/#{new_filename}"]
+                .write(:file => new_path) &&
+              s3.buckets[Boxlet.config[:s3][:bucket]]
+                .objects["#{@params[:uuid]}/#{new_thumb_filename}"]
+                .write(:file => new_thumb_path)
+
+              FileUtils.rm(new_path)
+              FileUtils.rm(new_thumb_path)
+              pp 'Uploading to S3... Done!' if Boxlet.config[:debug]
+            else
+              pp 'Uploading to S3... Error!!' if Boxlet.config[:debug]
+            end
           end
         end
 
@@ -162,61 +170,61 @@ module Boxlet
 
     private
 
-    def db
-      Boxlet::Db.connection
-    end
+      def db
+        Boxlet::Db.connection
+      end
 
-    def set_user
-      user_model.merge db.collection('users').find({uuid: @params[:uuid]}).to_a.first || {}
-    end
+      def set_user
+        user_model.merge db.collection('users').find({uuid: @params[:uuid]}).to_a.first || {}
+      end
 
-    def user_upload_dir
-      dir_name = @params[:uuid] || ''
-      user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + dir_name
-      Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
+      def user_upload_dir
+        dir_name = @params[:uuid] || ''
+        user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + dir_name
+        Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
 
-      if @params[:uuid]
-        dir_shortname = Digest::MD5.hexdigest(dir_name)
-        user_upload_dir_shortname = Boxlet.config[:upload_dir] + "/" + dir_shortname
+        if @params[:uuid]
+          dir_shortname = Digest::MD5.hexdigest(dir_name)
+          user_upload_dir_shortname = Boxlet.config[:upload_dir] + "/" + dir_shortname
 
-        File.symlink(dir_name, user_upload_dir_shortname) if !File.symlink? user_upload_dir_shortname
+          File.symlink(dir_name, user_upload_dir_shortname) if !File.symlink? user_upload_dir_shortname
 
-        if File.symlink? user_upload_dir_shortname
-          user_upload_dir_shortname
+          if File.symlink? user_upload_dir_shortname
+            user_upload_dir_shortname
+          else
+            user_upload_dir_name
+          end
         else
           user_upload_dir_name
         end
-      else
-        user_upload_dir_name
       end
-    end
 
-    def free_space?
-      Boxlet::App.free_space > 50
-    end
+      def free_space?
+        Boxlet::App.free_space > 50
+      end
 
 
-    # Models
+      # Models
 
-    def file_model
-      {
-        filename: '',
-        size: 0,
-        local_date: 0,
-        thumbnail: '',
-        asset_path: '',
-        asset_date: '',
-        uuid: []
-      }
-    end
+      def file_model
+        {
+          filename: '',
+          size: 0,
+          local_date: 0,
+          thumbnail: '',
+          asset_path: '',
+          asset_date: '',
+          uuid: []
+        }
+      end
 
-    def user_model
-      {
-        uuid: '',
-        notifications: 1,
-        last_activity: Time.now
-      }
-    end
+      def user_model
+        {
+          uuid: '',
+          notifications: 1,
+          last_activity: Time.now
+        }
+      end
 
   end
 end

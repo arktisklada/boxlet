@@ -51,6 +51,13 @@ host: localhost
 server_type: thin
 daemonize: false
 
+#use s3
+s3:
+  enabled: false
+  access_key_id:
+  secret_access_key:
+  bucket: boxlet
+
 # Database config
 db:
   development:
@@ -65,7 +72,7 @@ db:
 
 ```
 
-All config options are available as command-line parameters
+Many config options are available as command-line parameters
 
 - Path: `-f` or `--path`
   - Default: `./`

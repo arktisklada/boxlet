@@ -21,6 +21,13 @@ daemonize: false
 pid_file: server.pid
 log_file: server.log
 
+#use s3
+s3:
+  enabled: false
+  access_key_id:
+  secret_access_key:
+  bucket: boxlet
+
 # Database config
 db:
   development:

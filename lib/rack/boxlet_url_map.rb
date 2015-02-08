@@ -36,14 +36,14 @@ module Rack
     def call(env)
       path = env["PATH_INFO"]
       script_name = env['SCRIPT_NAME']
-      hHost = env['HTTP_HOST']
-      sName = env['SERVER_NAME']
-      sPort = env['SERVER_PORT']
+      http_host = env['HTTP_HOST']
+      server_name = env['SERVER_NAME']
+      server_port = env['SERVER_PORT']
 
       @mapping.each do |host, location, match, app|
-        unless hHost == host \
-            || sName == host \
-            || (!host && (hHost == sName || hHost == sName+':'+sPort))
+        unless http_host == host \
+            || server_name == host \
+            || (!host && (http_host == server_name || http_host == server_name + ':' + server_port))
           next
         end
 
