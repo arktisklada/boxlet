@@ -58,6 +58,9 @@ module Boxlet
       :log_file => {
         :short      => 'L',
         :default    => Proc.new { Dir.pwd + "/server.log" }
+      },
+      :s3 => {
+        :default    => { enabled: false }
       }
     }
 
