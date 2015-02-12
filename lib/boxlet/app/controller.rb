@@ -76,7 +76,8 @@ module Boxlet
       {
         capacity: Boxlet::App.app_space_capacity,
         usage: Boxlet::App.app_space_usage,
-        free_space: free_space?
+        free_space: free_space?,
+        remote: Boxlet.config[:s3][:enabled] == true
       }
     end
 
@@ -94,11 +95,9 @@ module Boxlet
 
       new_thumb_filename = "#{asset_path_params["id"]}-thumb.#{asset_path_params["ext"]}"
       new_thumb_path = File.join(upload_path, new_thumb_filename)
-      # FileUtils.cp(new_path, new_thumb_path)
 
       if File.exists? new_path
         file = File.open(new_path, 'r')
-        # asset_date = Date.parse(@params[:asset_date])
         asset = {
           filename: new_filename,
           size: file.size,

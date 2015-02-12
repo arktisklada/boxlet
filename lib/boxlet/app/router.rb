@@ -23,13 +23,13 @@ module Boxlet
 
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)
-      if (@method == :* || request.get? && @method == :get) || (request.post? && @method == :post)
+      if @method == :* || (request.get? && @method == :get) || (request.post? && @method == :post)
         puts "Responding: #{@method.upcase} => #{@action}" if Boxlet.debug?
         action_response = controller.action(@action)
         response.status = 200
       else
         response.status = 404
-        action_response[:content] = "404 not found"
+        action_response = {format: :html, content: "404 not found"}
       end
 
       if action_response[:format] == :json

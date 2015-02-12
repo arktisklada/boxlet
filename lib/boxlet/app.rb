@@ -72,11 +72,13 @@ module Boxlet
         end
 
         # Check for free space
-        if Boxlet::App.free_space <= 50
-          raise "Not enough free space"
-        end
-        if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
-          puts "App is over 90% full"
+        if !Boxlet.config[:s3][:enabled]
+          if Boxlet::App.free_space <= 50
+            raise "Not enough free space"
+          end
+          if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
+            puts "App is over 90% full"
+          end
         end
 
         puts "\nBoxlet setup is done!"
@@ -89,10 +91,12 @@ module Boxlet
     # App disk space functions
 
     def self.free_space
+      return -1 if Boxlet.config[:s3][:enabled]
       Boxlet::App.app_space_capacity - Boxlet::App.app_space_usage
     end
 
     def self.app_space_capacity
+      return -1 if Boxlet.config[:s3][:enabled]
       drive_free_space = Boxlet::App.drive_free_space
       if Boxlet.config[:capacity].is_a? String
         Boxlet::App.drive_free_space * Boxlet.config[:capacity].to_i / 100
@@ -103,6 +107,7 @@ module Boxlet
 
     def self.app_space_usage
       raise RuntimeError, "#{Boxlet.config[:upload_dir]} is not a directory" unless File.directory?(Boxlet.config[:upload_dir])
+      return -1 if Boxlet.config[:s3][:enabled]
 
       total_size = 0
       Dir["#{Boxlet.config[:upload_dir]}/**/*"].each do |f|
