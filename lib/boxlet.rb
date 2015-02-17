@@ -1,10 +1,10 @@
-require "yaml"
-require "rack/contrib"
-require "boxlet/version"
-require "boxlet/app"
-require "boxlet/log"
-require "boxlet/config"
-require "boxlet/runner"
+require 'yaml'
+require 'rack/contrib'
+require 'boxlet/version'
+require 'boxlet/app'
+require 'boxlet/log'
+require 'boxlet/config'
+require 'boxlet/runner'
 
 
 APP_ROOT = Dir.pwd

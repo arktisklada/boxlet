@@ -1,5 +1,5 @@
-require "rack"
-require "rack/boxlet_url_map"
+require 'rack'
+require 'rack/boxlet_url_map'
 
 
 module Rack

@@ -1,6 +1,6 @@
-require "thin"
-require "rack/content_length"
-require "rack/chunked"
+require 'thin'
+require 'rack/content_length'
+require 'rack/chunked'
 
 
 module Boxlet

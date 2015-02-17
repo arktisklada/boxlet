@@ -1,4 +1,4 @@
-require "handlers/thin"
+require 'handlers/thin'
 
 
 module Boxlet

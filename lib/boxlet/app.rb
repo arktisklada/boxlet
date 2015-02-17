@@ -1,11 +1,11 @@
-require "sys/filesystem"
 #require "rack/boxlet_url_builder"
-require "rack/request"
-require "rack/response"
-require "rack/file_upload"
-require "boxlet/db"
-require "boxlet/app/router"
-require "boxlet/app/models"
+require 'rack/request'
+require 'rack/response'
+require 'rack/file_upload'
+require 'boxlet/db'
+require 'boxlet/util'
+require 'boxlet/app/router'
+require 'boxlet/app/models'
 
 
 module Boxlet
@@ -28,8 +28,8 @@ module Boxlet
     end
 
     def bind
-      usage = Boxlet::App.app_space_usage
-      capacity = Boxlet::App.app_space_capacity
+      usage = Boxlet::Util.app_space_usage
+      capacity = Boxlet::Util.app_space_capacity
       Boxlet.log(:info, "INFO: Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)")
 
       Rack::Builder.new do
@@ -73,11 +73,11 @@ module Boxlet
 
         # Check for free space
         if !Boxlet.config[:s3][:enabled]
-          if Boxlet::App.free_space <= 50
+          if Boxlet::Util.free_space <= 50
             raise "Not enough free space"
           end
-          if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
-            Boxlet.log(:info, "App is over 90% full")
+          if Boxlet::Util.app_space_usage / Boxlet::Util.app_space_capacity >= 0.9
+            Boxlet.log(:warn, "App is over 90% full")
           end
         end
 
@@ -96,13 +96,15 @@ module Boxlet
         raise 'You must specify a password with -p'
       end
 
-      password = encrypt(password)
-      user = Boxlet::Models.user_model.merge({username: username, password: password})
+      password = Boxlet::Util.encrypt(password)
       db = Boxlet::Db.connection
-      if db.collection('users').find({username: username}).to_a.first
-        raise 'username already exists'
+      query_params = {username: username, password: password}
+      if db.collection('users').find(query_params).count > 0
+        raise "Username \"#{username}\" already exists"
       else
+        user = Boxlet::Models.user_model.merge({username: username, password: password})
         db.collection('users').insert(user)
+        Boxlet.log(:info, "User created successfully")
       end
     rescue Exception => e
       Boxlet.log(:fatal, "ERROR: #{e}")
@@ -112,75 +114,26 @@ module Boxlet
       unless username = args['-u']
         raise 'You must specify a username with -u'
       end
-      unless old_password = args['--old']
-        raise 'You must provide the old password with --old'
+      unless current_password = args['-p']
+        raise 'You must provide the current password with -p'
       end
       unless new_password = args['--new']
         raise 'You must specify a new password with --new'
       end
 
-      old_password = encrypt(old_password)
-      new_password = encrypt(new_password)
-      user = Boxlet::Models.user_model.merge({username: username, password: old_password})
+      current_password = Boxlet::Util.encrypt(current_password)
+      new_password = Boxlet::Util.encrypt(new_password)
+      query_params = {username: username, password: current_password}
       db = Boxlet::Db.connection
-      if db.collection('users').find({username: username}).to_a.first
-        db.collection('users').update({username: username}, {password: new_password})
+      if db.collection('users').find(query_params).count > 0
+        db.collection('users').update({username: username}, {'$set' => {password: new_password}})
+        Boxlet.log(:info, "Password updated successfully for \"#{username}\"")
       else
-        raise 'username does not exist or old password incorrect'
+        raise 'Username does not exist or password incorrect'
       end
     rescue Exception => e
       Boxlet.log(:fatal, "ERROR: #{e}")
     end
-
-
-    # App disk space functions
-
-    def self.free_space
-      return -1 if Boxlet.config[:s3][:enabled]
-      Boxlet::App.app_space_capacity - Boxlet::App.app_space_usage
-    end
-
-    def self.app_space_capacity
-      return -1 if Boxlet.config[:s3][:enabled]
-      drive_free_space = Boxlet::App.drive_free_space
-      if Boxlet.config[:capacity].is_a?(String)
-        Boxlet::App.drive_free_space * Boxlet.config[:capacity].to_i / 100
-      else
-        Boxlet.config[:capacity]
-      end
-    end
-
-    def self.app_space_usage
-      raise RuntimeError, "#{Boxlet.config[:upload_dir]} is not a directory" unless File.directory?(Boxlet.config[:upload_dir])
-      return -1 if Boxlet.config[:s3][:enabled]
-
-      total_size = 0
-      Dir["#{Boxlet.config[:upload_dir]}/**/*"].each do |f|
-        total_size += File.size(f) if File.file?(f) && File.size?(f)
-      end
-      total_size / 1000000 # / 1048576 # to megabytes
-    rescue Exception => e
-      Boxlet.log(:fatal, "ERROR: #{e}")
-    end
-
-    # Drive disk space functions
-
-    def self.drive_free_space
-      stat = Filesystem.stat(Boxlet.config[:file_system_root])
-      (stat.block_size * stat.blocks_available).to_mb
-    end
-
-    def self.drive_capacity
-      stat = Filesystem.stat(Boxlet.config[:file_system_root])
-      (stat.block_size * stat.blocks).to_mb
-    end
-
-
-    private
-
-      def encrypt(string)
-        (Digest::SHA256.new << string).to_s
-      end
 
   end
 end

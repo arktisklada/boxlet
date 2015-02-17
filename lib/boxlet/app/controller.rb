@@ -73,8 +73,8 @@ module Boxlet
       @format = :json
 
       {
-        capacity: Boxlet::App.app_space_capacity,
-        usage: Boxlet::App.app_space_usage,
+        capacity: Boxlet::Util.app_space_capacity,
+        usage: Boxlet::Util.app_space_usage,
         free_space: free_space?
       }
     end
@@ -197,7 +197,7 @@ module Boxlet
       end
 
       def free_space?
-        Boxlet::App.free_space > 50
+        Boxlet::Util.free_space > 50
       end
   end
 end

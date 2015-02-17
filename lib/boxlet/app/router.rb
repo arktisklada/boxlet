@@ -1,7 +1,7 @@
-require "rack/request"
-require "rack/response"
-require "boxlet/app/controller"
-require "json"
+require 'rack/request'
+require 'rack/response'
+require 'boxlet/app/controller'
+require 'json'
 
 
 module Boxlet
