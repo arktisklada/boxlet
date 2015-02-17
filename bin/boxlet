@@ -3,7 +3,9 @@
 require 'boxlet'
 
 argv = *ARGV
-command = argv.count % 2 != 0 ? argv.shift : 'run'
+raise 'Invalid command' if argv[0] && argv[0][0] == '-'
+command = argv.shift
+raise 'Invalid parameters' if argv.count % 2 != 0
 argv_hash = Hash[*argv]
 
 config = argv_hash["-c"] || argv_hash["--config"]

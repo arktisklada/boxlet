@@ -17,14 +17,12 @@ module Boxlet
     def call(env)
       request = Rack::Request.new(env)
 
-      if Boxlet.debug?
-        puts "\n#{env["REMOTE_ADDR"]} - [#{Time.now.to_s}] #{@method.upcase} #{env["SERVER_PROTOCOL"]} => #{env["REQUEST_PATH"]}"
-      end
+      Boxlet.log(:info, "INFO: #{env["REMOTE_ADDR"]} - [#{Time.now.to_s}] #{@method.upcase} #{env["SERVER_PROTOCOL"]} => #{env["REQUEST_PATH"]}")
 
       response = Rack::Response.new
       controller = Boxlet::Controller.new(request)
       if @method == :* || (request.get? && @method == :get) || (request.post? && @method == :post)
-        puts "Responding: #{@method.upcase} => #{@action}" if Boxlet.debug?
+        Boxlet.log(:info, "INFO: Responding: #{@method.upcase} => #{@action}")
         action_response = controller.action(@action)
         response.status = 200
       else

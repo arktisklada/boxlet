@@ -2,9 +2,9 @@ require "yaml"
 require "rack/contrib"
 require "boxlet/version"
 require "boxlet/app"
+require "boxlet/log"
 require "boxlet/config"
 require "boxlet/runner"
-require "pp" #unless ENV['RACK_ENV'] == 'production'
 
 
 APP_ROOT = Dir.pwd
@@ -19,35 +19,38 @@ module Boxlet
 
   def run!(argv, command='run', config_file='config.yml', &blk)
     populate_params!(argv, config_file)
-    app = Boxlet::App.new
+    @log = Boxlet::Log.new(@config[:log_file], (debug? ? Logger::DEBUG : Logger::INFO))
+    @app = Boxlet::App.new
 
     case command
       when 'run'
+        Boxlet.log(:debug, @config)
         @runner = Boxlet::Runner.new
-        @runner.start(app.bind, &blk)
+        @runner.start(@app.bind, &blk)
       else
-        app.send(command, Boxlet.config)
+        @app.send(command, argv)
     end
 
-    app
+    @app
   end
 
   def stop!
     @runner.stop
-    app
+    @app
   end
 
 
   def debug?
-    @config[:debug] == true ? true : false
+    @config[:debug] == true
   end
-
   def config
     @config
   end
-
   def params
     @params
+  end
+  def log(level, message)
+    @log.write(level, message)
   end
 
 end

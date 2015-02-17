@@ -70,11 +70,7 @@ module Boxlet
       @raw_params = parse_arguments(argv)
 
       @config = @raw_params
-
       @config[:debug] = @raw_config[:debug] || @raw_params[:debug]
-      if @config[:debug]
-        pp @config
-      end
     end
 
 
@@ -88,44 +84,42 @@ module Boxlet
       }
     end
 
+
     private
 
-    def parse_arguments(argv)
-      # params = Hash.new
-      params = @raw_config
+      def parse_arguments(argv)
+        # params = Hash.new
+        params = @raw_config
 
-      ARGS.each_pair do |param_name, param_attrs|
-        param_short_name = param_attrs[:short]
-        config_value = @raw_config[param_name.to_sym]
-        default = param_attrs[:default]
-        sanitizer = param_attrs[:sanitizer]
+        ARGS.each_pair do |param_name, param_attrs|
+          param_short_name = param_attrs[:short]
+          config_value = @raw_config[param_name.to_sym]
+          default = param_attrs[:default]
+          sanitizer = param_attrs[:sanitizer]
 
-        param_value = argv["--#{param_name}"] ||
-                      (param_short_name.nil? ? nil : argv["-#{param_short_name}"]) ||
-                      (config_value.nil? ? nil : config_value) ||
-                      (default.is_a?(Proc) ? default.call : default)
+          param_value = argv["--#{param_name}"] ||
+                        (param_short_name.nil? ? nil : argv["-#{param_short_name}"]) ||
+                        (config_value.nil? ? nil : config_value) ||
+                        (default.is_a?(Proc) ? default.call : default)
 
-        param_value = sanitizer.call(param_value) if sanitizer.is_a?(Proc)
+          param_value = sanitizer.call(param_value) if sanitizer.is_a?(Proc)
 
-        if !param_value.nil?
-          params[param_name] = param_value
+          if !param_value.nil?
+            params[param_name] = param_value
+          end
+        end
+
+        params
+      end
+
+      def load_config_file(path_to_config)
+        begin
+          loaded_config = YAML.load_file(path_to_config)
+          symbolize_keys(loaded_config)
+        rescue
+          Boxlet.log(:warn, "Error loading config file!  Using defaults...")
+          {}
         end
       end
-
-      params
     end
-
-    def load_config_file(path_to_config)
-      begin
-        loaded_config = YAML.load_file(path_to_config)
-        symbolize_keys(loaded_config)
-      rescue
-        puts "Error loading config file!  Using defaults..."
-        {}
-      end
-    end
-
-  end
-
-  
 end

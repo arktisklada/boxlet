@@ -5,6 +5,7 @@ require "rack/response"
 require "rack/file_upload"
 require "boxlet/db"
 require "boxlet/app/router"
+require "boxlet/app/models"
 
 
 module Boxlet
@@ -27,11 +28,9 @@ module Boxlet
     end
 
     def bind
-      if Boxlet.debug?
-        usage = Boxlet::App.app_space_usage
-        capacity = Boxlet::App.app_space_capacity
-        puts "Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)"
-      end
+      usage = Boxlet::App.app_space_usage
+      capacity = Boxlet::App.app_space_capacity
+      Boxlet.log(:info, "INFO: Space Utilization: #{usage}MB / #{capacity}MB (#{(usage.to_f / capacity).round(3)}%)")
 
       Rack::Builder.new do
         use Rack::Reloader
@@ -48,24 +47,25 @@ module Boxlet
     end
 
 
-    def setup(config)
+    def setup(args)
       begin
+        Boxlet.log(:debug, Boxlet.config)
         # Create upload and tmp directories
         upload_dir = Boxlet.config[:upload_dir]
         tmp_dir = Boxlet.config[:tmp_dir]
         if !File.exists?(upload_dir) || !File.exists?(tmp_dir)
           if !File.exists?(upload_dir)
-            puts "Upload directory (#{upload_dir}) does not exist.  Creating..."
+            Boxlet.log(:info, "Upload directory (#{upload_dir}) does not exist.  Creating...")
             Dir.mkdir(upload_dir)
-            puts "Upload directory created!"
+            Boxlet.log(:info, "Upload directory created!")
           end
           if !File.exists?(tmp_dir)
-            puts "Temp directory (#{tmp_dir}) does not exist.  Creating..."
+            Boxlet.log(:info, "Temp directory (#{tmp_dir}) does not exist.  Creating...")
             Dir.mkdir(tmp_dir)
-            puts "Temp directory created!"
+            Boxlet.log(:info, "Temp directory created!")
           end
           if File.exists?(upload_dir) && File.exists?(tmp_dir)
-            puts "Done creating directories."
+            Boxlet.log(:info, "Done creating directories.")
           else
             raise "Error creating directories.  Please check your config and file permissions, and retry."
           end
@@ -77,14 +77,59 @@ module Boxlet
             raise "Not enough free space"
           end
           if Boxlet::App.app_space_usage / Boxlet::App.app_space_capacity >= 0.9
-            puts "App is over 90% full"
+            Boxlet.log(:info, "App is over 90% full")
           end
         end
 
-        puts "\nBoxlet setup is done!"
-      rescue => e
-        puts "\nERROR: #{e}"
+        Boxlet.log(:info, "Boxlet setup is done!")
+      rescue Exception => e
+        Boxlet.log(:fatal, "ERROR: #{e}")
       end
+    end
+
+
+    def add_user(args)
+      unless username = args['-u']
+        raise 'You must specify a username with -u'
+      end
+      unless password = args['-p']
+        raise 'You must specify a password with -p'
+      end
+
+      password = encrypt(password)
+      user = Boxlet::Models.user_model.merge({username: username, password: password})
+      db = Boxlet::Db.connection
+      if db.collection('users').find({username: username}).to_a.first
+        raise 'username already exists'
+      else
+        db.collection('users').insert(user)
+      end
+    rescue Exception => e
+      Boxlet.log(:fatal, "ERROR: #{e}")
+    end
+
+    def change_password(args)
+      unless username = args['-u']
+        raise 'You must specify a username with -u'
+      end
+      unless old_password = args['--old']
+        raise 'You must provide the old password with --old'
+      end
+      unless new_password = args['--new']
+        raise 'You must specify a new password with --new'
+      end
+
+      old_password = encrypt(old_password)
+      new_password = encrypt(new_password)
+      user = Boxlet::Models.user_model.merge({username: username, password: old_password})
+      db = Boxlet::Db.connection
+      if db.collection('users').find({username: username}).to_a.first
+        db.collection('users').update({username: username}, {password: new_password})
+      else
+        raise 'username does not exist or old password incorrect'
+      end
+    rescue Exception => e
+      Boxlet.log(:fatal, "ERROR: #{e}")
     end
 
 
@@ -114,6 +159,8 @@ module Boxlet
         total_size += File.size(f) if File.file?(f) && File.size?(f)
       end
       total_size / 1000000 # / 1048576 # to megabytes
+    rescue Exception => e
+      Boxlet.log(:fatal, "ERROR: #{e}")
     end
 
     # Drive disk space functions
@@ -128,6 +175,12 @@ module Boxlet
       (stat.block_size * stat.blocks).to_mb
     end
 
+
+    private
+
+      def encrypt(string)
+        (Digest::SHA256.new << string).to_s
+      end
 
   end
 end

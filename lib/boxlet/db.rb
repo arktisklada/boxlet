@@ -19,7 +19,7 @@ module Boxlet
 
       host = db_config[:host] || 'localhost'
       port = db_config[:port] || MongoClient::DEFAULT_PORT
-      puts "Connecting to #{host}:#{port}" if Boxlet.debug?
+      Boxlet.log(:info, "INFO: Connecting to #{host}:#{port}")
       client  = MongoClient.new(host, port)
       db = client.db(db_config[:db] || 'boxlet_development')
       return db

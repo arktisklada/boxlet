@@ -22,7 +22,7 @@ module Boxlet
     def initialize(request)
       @request = request
       @params = Boxlet.symbolize_keys request.params
-      pp request.params
+      Boxlet.log(:info, request.params)
 
       @format = :html
     end
@@ -49,10 +49,10 @@ module Boxlet
     # def register_device
     #   @format = :json
 
-    #   pp @params if Boxlet.config[:debug]
+    #   Boxlet.log(:debug, @params)
 
     #   uuid = @params[:uuid]
-    #   # user = user_model.merge { uuid: uuid }
+    #   # user = Boxlet::Models.user_model.merge { uuid: uuid }
     #   if db.collection('users').insert(user)
     #     {response: true}
     #   else
@@ -65,7 +65,6 @@ module Boxlet
 
     #   uuid = @params[:uuid]
     #   notifications = @params[:notifications]
-    #   pp uuid
     #   # @user
     #   "notifications"
     # end
@@ -112,7 +111,7 @@ module Boxlet
           Image.resize(new_path, new_thumb_path, 150, 150)
 
           if Boxlet.config[:s3][:enabled]
-            pp 'Uploading to S3...' if Boxlet.config[:debug]
+            Boxlet.log(:debug, 'Uploading to S3...')
 
             s3 = AWS::S3.new(
               :access_key_id => Boxlet.config[:s3][:access_key_id],
@@ -127,9 +126,9 @@ module Boxlet
 
               FileUtils.rm(new_path)
               FileUtils.rm(new_thumb_path)
-              pp 'Uploading to S3... Done!' if Boxlet.config[:debug]
+              Boxlet.log(:debug, 'Uploading to S3... Done!')
             else
-              pp 'Uploading to S3... Error!!' if Boxlet.config[:debug]
+              Boxlet.log(:debug, 'Uploading to S3... Error!!')
             end
           end
         end
@@ -152,7 +151,7 @@ module Boxlet
 
       uuid = @params[:uuid]
       asset_path = @params[:asset_path]
-      file_model.merge db.collection('assets').find({asset_path: asset_path, uuid: uuid}).to_a.first || {}
+      Boxlet::Models.file_model.merge db.collection('assets').find({asset_path: asset_path, uuid: uuid}).to_a.first || {}
     end
 
     def resync
@@ -173,7 +172,7 @@ module Boxlet
       end
 
       def set_user
-        user_model.merge db.collection('users').find({uuid: @params[:uuid]}).to_a.first || {}
+        Boxlet::Models.user_model.merge db.collection('users').find({uuid: @params[:uuid]}).to_a.first || {}
       end
 
       def user_upload_dir
@@ -200,29 +199,5 @@ module Boxlet
       def free_space?
         Boxlet::App.free_space > 50
       end
-
-
-      # Models
-
-      def file_model
-        {
-          filename: '',
-          size: 0,
-          local_date: 0,
-          thumbnail: '',
-          asset_path: '',
-          asset_date: '',
-          uuid: []
-        }
-      end
-
-      def user_model
-        {
-          uuid: '',
-          notifications: 1,
-          last_activity: Time.now
-        }
-      end
-
   end
 end
