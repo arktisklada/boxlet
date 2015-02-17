@@ -88,7 +88,6 @@ module Boxlet
     private
 
       def parse_arguments(argv)
-        # params = Hash.new
         params = @raw_config
 
         ARGS.each_pair do |param_name, param_attrs|

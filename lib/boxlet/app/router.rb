@@ -31,9 +31,9 @@ module Boxlet
       end
 
       if action_response[:format] == :json
-        response.write action_response[:content].to_json
+        response.write(action_response[:content].to_json)
       else
-        response.write action_response[:content]
+        response.write(action_response[:content])
       end
 
       response.finish

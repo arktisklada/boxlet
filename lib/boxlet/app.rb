@@ -143,7 +143,7 @@ module Boxlet
     def self.app_space_capacity
       return -1 if Boxlet.config[:s3][:enabled]
       drive_free_space = Boxlet::App.drive_free_space
-      if Boxlet.config[:capacity].is_a? String
+      if Boxlet.config[:capacity].is_a?(String)
         Boxlet::App.drive_free_space * Boxlet.config[:capacity].to_i / 100
       else
         Boxlet.config[:capacity]

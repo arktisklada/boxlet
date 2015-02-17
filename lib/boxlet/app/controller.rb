@@ -21,7 +21,7 @@ module Boxlet
 
     def initialize(request)
       @request = request
-      @params = Boxlet.symbolize_keys request.params
+      @params = Boxlet.symbolize_keys(request.params)
       Boxlet.log(:info, request.params)
 
       @format = :html
@@ -94,7 +94,7 @@ module Boxlet
       new_thumb_filename = "#{asset_path_params["id"]}-thumb.#{asset_path_params["ext"]}"
       new_thumb_path = File.join(upload_path, new_thumb_filename)
 
-      if File.exists? new_path
+      if File.exists?(new_path)
         file = File.open(new_path, 'r')
         asset = {
           filename: new_filename,
@@ -172,7 +172,7 @@ module Boxlet
       end
 
       def set_user
-        Boxlet::Models.user_model.merge db.collection('users').find({uuid: @params[:uuid]}).to_a.first || {}
+        Boxlet::Models.user_model.merge(db.collection('users').find({uuid: @params[:uuid]}).to_a.first || {})
       end
 
       def user_upload_dir
@@ -186,7 +186,7 @@ module Boxlet
 
           File.symlink(dir_name, user_upload_dir_shortname) if !File.symlink? user_upload_dir_shortname
 
-          if File.symlink? user_upload_dir_shortname
+          if File.symlink?(user_upload_dir_shortname)
             user_upload_dir_shortname
           else
             user_upload_dir_name
