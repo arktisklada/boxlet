@@ -2,6 +2,7 @@ module Boxlet
   module Models
     def self.file_model
       {
+        _table: 'assets',
         filename: '',
         size: 0,
         local_date: 0,
@@ -14,6 +15,7 @@ module Boxlet
 
     def self.user_model
       {
+        _table: 'users',
         username: '',
         password: '',
         uuid: '',
@@ -22,5 +24,15 @@ module Boxlet
       }
     end
 
+    class Model
+      def initialize(properties={})
+        @_table = properties.delete(:_table)
+      end
+
+      private
+        def db
+          Boxlet::Db.connection
+        end
+    end
   end
 end
