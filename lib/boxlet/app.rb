@@ -23,7 +23,8 @@ module Boxlet
         ["/push_files", :post]      => :push_files,
         ["/file_list"]              => :file_list,
         ["/file_info"]              => :file_info,
-        ["/resync", :get]           => :resync
+        ["/resync", :get]           => :resync,
+        ["/flashback", :post]       => :flashback
       }
     end
 

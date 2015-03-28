@@ -11,7 +11,9 @@ require 'aws-sdk'
 #   ["/notifications", :post]   => :notifications,
 #   ["/push_files", :post]      => :push_files,
 #   ["/file_list"]              => :file_list,
-#   ["/file_info"]              => :file_info
+#   ["/file_info"]              => :file_info,
+#   ["/resync", :get]           => :resync,
+#   ["/flashback", :post]       => :flashback
 # }
 
 
@@ -162,6 +164,14 @@ module Boxlet
           db.collection('assets').remove({"_id" => a["_id"]})
         end
       end
+    end
+
+    def flashback
+      @format = :json
+
+      date = Date.parse(@params[:date])
+      uuid = @params[:uuid]
+      db.collection('assets').find({uuid: uuid, asset_date: {:'$gte' => date.to_time, :'$lt' => (date + 1).to_time}}).to_a
     end
 
 

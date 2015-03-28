@@ -2,6 +2,7 @@ require 'sys/filesystem'
 
 module Boxlet
   module Util
+    include Sys
 
     # Auth methods
 
