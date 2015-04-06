@@ -221,8 +221,6 @@ module Boxlet
         if Boxlet.config[:s3][:enabled]
           "https://s3.amazonaws.com/#{Boxlet.config[:s3][:bucket]}/#{@params[:uuid]}"
         else
-          puts Boxlet.config[:host]
-          pp Boxlet.config
           "http://#{Boxlet.config[:public_url]}/#{Boxlet.config[:upload_dir]}/#{Digest::MD5.hexdigest(@params[:uuid])}"
         end
       end
