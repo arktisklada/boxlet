@@ -171,7 +171,13 @@ module Boxlet
 
       date = Date.parse(@params[:date])
       uuid = @params[:uuid]
-      db.collection('assets').find({uuid: uuid, asset_date: {:'$gte' => date.to_time, :'$lt' => (date + 1).to_time}}).to_a
+      db.collection('assets').find({
+        uuid: uuid,
+        asset_date: {
+          '$gte' => date.to_time.strftime('%F'),
+          '$lt' => (date + 1).to_time.strftime('%F')
+        }
+      }).to_a
     end
 
 
