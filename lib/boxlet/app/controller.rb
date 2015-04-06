@@ -77,7 +77,8 @@ module Boxlet
       {
         capacity: Boxlet::Util.app_space_capacity,
         usage: Boxlet::Util.app_space_usage,
-        free_space: free_space?
+        free_space: free_space?,
+        base_upload_path: base_upload_path
       }
     end
 
@@ -145,7 +146,7 @@ module Boxlet
       @format = :json
 
       uuid = @params[:uuid]
-      db.collection('assets').find({uuid: uuid}).to_a
+      stats.merge(assets: db.collection('assets').find({uuid: uuid}).to_a)
     end
 
     def file_info
@@ -171,13 +172,13 @@ module Boxlet
 
       date = Date.parse(@params[:date])
       uuid = @params[:uuid]
-      db.collection('assets').find({
+      stats.merge(assets: db.collection('assets').find({
         uuid: uuid,
         asset_date: {
           '$gte' => date.to_time.strftime('%F'),
           '$lt' => (date + 1).to_time.strftime('%F')
         }
-      }).to_a
+      }).to_a)
     end
 
 
@@ -214,6 +215,16 @@ module Boxlet
 
       def free_space?
         Boxlet::Util.free_space > 50
+      end
+
+      def base_upload_path
+        if Boxlet.config[:s3][:enabled]
+          "https://s3.amazonaws.com/#{Boxlet.config[:s3][:bucket]}/#{@params[:uuid]}"
+        else
+          puts Boxlet.config[:host]
+          pp Boxlet.config
+          "http://#{Boxlet.config[:public_url]}/#{Boxlet.config[:upload_dir]}/#{Digest::MD5.hexdigest(@params[:uuid])}"
+        end
       end
   end
 end

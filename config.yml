@@ -20,6 +20,7 @@ server_type: thin
 daemonize: false
 pid_file: server.pid
 log_file: server.log
+public_url: http://localhost:8077
 
 #use s3
 s3:
