@@ -136,7 +136,7 @@ module Boxlet
           end
         end
 
-        {response: true}
+        {response: asset}
       else
         {response: false}
       end
