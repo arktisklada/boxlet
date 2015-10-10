@@ -103,6 +103,7 @@ module Boxlet
           filename: new_filename,
           size: file.size,
           local_date: file.mtime.to_i,
+          orientation: @params[:orientation],
           thumbnail: new_thumb_filename,
           asset_path: @params[:asset_path],
           asset_date: @params[:asset_date],
