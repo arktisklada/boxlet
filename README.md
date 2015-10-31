@@ -22,7 +22,7 @@ From the mobile iOS app, you can specify any server:port where the Boxlet server
 
 ## Usage
 
-Run `boxlet` from any folder to stat the server with default settings.
+Run `boxlet run` from any folder to stat the server with default settings.
 
 See below for config and parameters.
 
@@ -104,8 +104,7 @@ Many config options are available as command-line parameters
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+1. Fork this repo
+2. Create an [issue/feature request](https://github.com/arktisklada/boxlet/issues)
+3. Create, commit, and push your feature branch (my-new-feature)
+4. Create new Pull Request
