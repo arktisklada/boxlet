@@ -23,5 +23,5 @@ test_run
 notes
 uploads
 builds
-
+.DS_Store
 config.ru
