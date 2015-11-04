@@ -34,11 +34,17 @@
     color: #000;
     text-decoration: underline;
   }
+  ul {
+    margin: 1em 0;
+    width: 90%;
+  }
   li {
-    font-size: 1.5em;
+    font-size: 2em;
     line-height: 2em;
     list-style-position: inside;
     list-style-type: square;
+    margin-left: 1em;
+    text-align: left;
   }
   hr {
     margin: 2em 0 1em;
@@ -128,9 +134,10 @@
   }
 
   .footer {
-    color: #333;
-    position: absolute;
     bottom: 1em;
+    color: #333;
+    font-size: 1.5em;
+    position: absolute;
     right: 1em;
   }
 
@@ -169,6 +176,9 @@
   p {
     font-size: 2em;
   }
+  li {
+    font-size: 1.5em;
+  }
   .section.no-overflow {
     overflow: hidden;
   }
@@ -206,6 +216,10 @@
   }
   .small-only {
     display: none;
+  }
+  .footer {
+    font-size: 1em;
+    right: 1.5%;
   }
 }
 
