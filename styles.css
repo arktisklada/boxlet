@@ -15,7 +15,7 @@
   }
   h2 {
     font-size: 3em;
-    margin: 1em 0;
+    margin: 0 0 0.5em;
     border-bottom: 1px solid #000;
     padding-bottom: 0.5em;
   }
@@ -59,6 +59,9 @@
   .slide {
     background-size: cover;
     text-align: center;
+  }
+  .section.no-overflow {
+    overflow: hidden;
   }
   .title-logo {
     width: 90%;
@@ -146,6 +149,20 @@
     margin: 0 1em;
     vertical-align: middle;
   }
+  .apple-store {
+    background: url(http://linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.svg) no-repeat;
+    height: 40px;
+    overflow: hidden;
+    width: 135px;
+  }
+  .github {
+    background-color: white;
+    border: 1px solid black;
+    font-size: 8px;
+    padding: 0.75em;
+    border-radius: 5px;
+  }
+  .github img,
   .github-logo {
     max-width: 100px !important;
   }
@@ -159,8 +176,23 @@
 }
 
 @media only screen and (max-width: 40em) { /* max-width 640px, small screens */
+  h2 {
+    margin: 1.5em 0;
+  }
   .hide-on-small {
     display: none;
+  }
+  .section:not(#home) {
+    padding-bottom: 4em;
+  }
+  #features .slide h2 {
+    display: none;
+  }
+  #features .slide p {
+    padding: 0 2em;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -178,9 +210,6 @@
   }
   li {
     font-size: 1.5em;
-  }
-  .section.no-overflow {
-    overflow: hidden;
   }
   .column-1,
   .column-2,
@@ -210,6 +239,9 @@
   }
   .column-6 {
     width: 100%;
+  }
+  .row.right > * {
+    float: right;
   }
   .hide-on-small {
     display: block;
