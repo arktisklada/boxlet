@@ -6,12 +6,9 @@ require 'boxlet/log'
 require 'boxlet/config'
 require 'boxlet/runner'
 
-
 APP_ROOT = Dir.pwd
 
-
 module Boxlet
-
   extend self
   extend Boxlet::Config
 

@@ -36,9 +36,7 @@ module Boxlet
       {format: @format, content: action_response}
     end
 
-
     # actions
-
     def index
       '<html><body><form action="/push_files" method="post" enctype="multipart/form-data">UUID:<input type="text" name="uuid"><br><input type="file" name="file"><input type="submit"></form>'
     end

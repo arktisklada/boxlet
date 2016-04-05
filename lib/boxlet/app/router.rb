@@ -6,7 +6,6 @@ require 'json'
 
 module Boxlet
   class Router
-
     attr_accessor :method, :action
 
     def initialize(method, action)
@@ -38,6 +37,5 @@ module Boxlet
 
       response.finish
     end
-
   end
 end

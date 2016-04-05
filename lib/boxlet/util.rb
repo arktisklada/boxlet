@@ -5,13 +5,11 @@ module Boxlet
     include Sys
 
     # Auth methods
-
     def self.encrypt(string)
       (Digest::SHA256.new << string).to_s
     end
 
     # App disk space functions
-
     def self.free_space
       return -1 if Boxlet.config[:s3][:enabled]
       Boxlet::Util.app_space_capacity - Boxlet::Util.app_space_usage
@@ -41,7 +39,6 @@ module Boxlet
     end
 
     # Drive disk space functions
-
     def self.drive_free_space
       stat = Filesystem.stat(Boxlet.config[:file_system_root])
       (stat.block_size * stat.blocks_available).to_mb
@@ -51,6 +48,5 @@ module Boxlet
       stat = Filesystem.stat(Boxlet.config[:file_system_root])
       (stat.block_size * stat.blocks).to_mb
     end
-
   end
 end

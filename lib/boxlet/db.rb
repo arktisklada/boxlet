@@ -3,7 +3,6 @@ require 'mongo'
 
 module Boxlet
   module Db
-
     extend self
     include Mongo
 
@@ -24,6 +23,5 @@ module Boxlet
       db = client.db(db_config[:db] || 'boxlet_development')
       return db
     end
-
   end
 end

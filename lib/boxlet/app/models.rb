@@ -21,6 +21,5 @@ module Boxlet
         last_activity: Time.now
       }
     end
-
   end
 end

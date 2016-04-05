@@ -32,6 +32,5 @@ module Boxlet
     def thin(app, params)
       Boxlet::Handlers::Thin.new(app, params)
     end
-
   end
 end

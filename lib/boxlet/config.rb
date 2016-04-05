@@ -64,7 +64,6 @@ module Boxlet
       }
     }
 
-
     def populate_params!(argv, path_to_config)
       @raw_config = load_config_file(path_to_config)
       @raw_params = parse_arguments(argv)
@@ -72,7 +71,6 @@ module Boxlet
       @config = @raw_params
       @config[:debug] = @raw_config[:debug] || @raw_params[:debug]
     end
-
 
     def symbolize_keys(hash)
       hash.inject({}){|result, (key, value)|
@@ -83,7 +81,6 @@ module Boxlet
         result
       }
     end
-
 
     private
 

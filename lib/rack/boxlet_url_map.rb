@@ -56,11 +56,9 @@ module Rack
       end
 
       [404, {"Content-Type" => "text/plain", "X-Cascade" => "pass"}, ["Not Found: #{path}"]]
-
     ensure
       env['PATH_INFO'] = path
       env['SCRIPT_NAME'] = script_name
     end
-
   end
 end

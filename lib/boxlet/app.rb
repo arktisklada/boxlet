@@ -47,7 +47,6 @@ module Boxlet
       end.to_app
     end
 
-
     def setup(args)
       begin
         Boxlet.log(:debug, Boxlet.config)
@@ -87,7 +86,6 @@ module Boxlet
         Boxlet.log(:fatal, "ERROR: #{e}")
       end
     end
-
 
     def add_user(args)
       unless username = args['-u']
@@ -135,6 +133,5 @@ module Boxlet
     rescue Exception => e
       Boxlet.log(:fatal, "ERROR: #{e}")
     end
-
   end
 end
