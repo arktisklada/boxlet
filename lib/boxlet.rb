@@ -12,6 +12,11 @@ module Boxlet
   extend self
   extend Boxlet::Config
 
+  PUBLIC_COMMANDS = {
+    run: "Run the Boxlet server",
+    stop: "Stop a daemonized server"
+  }.freeze
+
   attr_accessor :runner, :config, :raw_params, :raw_config
 
   def run!(argv, command='run', config_file='config.yml', &blk)
@@ -68,13 +73,24 @@ module Boxlet
     def print_menu
       puts "Usage: boxlet command [args]"
       puts
-      puts "Available commands are as follows:"
-      commands_with_descriptions = App::PUBLIC_COMMANDS.merge run: "Run the Boxlet server"
+      puts "Common commands:"
+      commands_with_descriptions = PUBLIC_COMMANDS.merge(App::PUBLIC_COMMANDS)
       commands = commands_with_descriptions.keys
-      max_chars = commands.sort { |a, b| a.length <=> b.length }.last.length
-      commands.sort.each do |command|
-        puts " #{command.to_s.ljust(max_chars)}   #{commands_with_descriptions[command]}"
+      max_command_chars = commands.sort { |a, b| a.length <=> b.length }.last.length
+      PUBLIC_COMMANDS.each do |command, description|
+        print_menu_command command, max_command_chars, description
       end
+
+      puts
+      puts "Additional commands:"
+      App::PUBLIC_COMMANDS.each do |command, description|
+        print_menu_command command, max_command_chars, description
+      end
+
+    end
+
+    def print_menu_command(command, max_command_chars, description)
+      puts "  #{command.to_s.ljust(max_command_chars)}   #{description}"
     end
 end
 
