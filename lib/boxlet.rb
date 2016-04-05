@@ -19,13 +19,24 @@ module Boxlet
     @log = Boxlet::Log.new(@config[:log_file], (debug? ? Logger::DEBUG : Logger::INFO))
     @app = Boxlet::App.new
 
+    command = command.to_s.to_sym
     case command
-      when 'run'
-        Boxlet.log(:debug, @config)
-        @runner = Boxlet::Runner.new
-        @runner.start(@app.bind, &blk)
-      else
+    when :run
+      Boxlet.log(:debug, @config)
+      @runner = Boxlet::Runner.new
+      @runner.start(@app.bind, &blk)
+    when :stop
+      if @config[:daemonize] == true
+        pid = File.read(@config[:pid_file]).to_i
+        puts "Killing #{pid}..."
+        Process.kill(Signal.list["TERM"], pid)
+      end
+    else
+      if App::PUBLIC_COMMANDS.keys.include?(command)
         @app.send(command, argv)
+      else
+        print_menu
+      end
     end
 
     @app
@@ -36,22 +47,36 @@ module Boxlet
     @app
   end
 
-
   def debug?
     @config[:debug] == true
   end
+
   def config
     @config
   end
+
   def params
     @params
   end
+
   def log(level, message)
     @log.write(level, message)
   end
 
-end
+  private
 
+    def print_menu
+      puts "Usage: boxlet command [args]"
+      puts
+      puts "Available commands are as follows:"
+      commands_with_descriptions = App::PUBLIC_COMMANDS.merge run: "Run the Boxlet server"
+      commands = commands_with_descriptions.keys
+      max_chars = commands.sort { |a, b| a.length <=> b.length }.last.length
+      commands.sort.each do |command|
+        puts " #{command.to_s.ljust(max_chars)}   #{commands_with_descriptions[command]}"
+      end
+    end
+end
 
 # Configure our temporary folder
 class Dir  

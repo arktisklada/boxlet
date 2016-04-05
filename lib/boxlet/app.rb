@@ -10,8 +10,13 @@ require 'boxlet/app/models'
 
 module Boxlet
   class App
-
     include Sys
+
+    PUBLIC_COMMANDS = {
+      add_user: "Add a new user to the database",
+      change_password: "Change a user's password",
+      setup: "Initialize a directory as a Boxlet app (create folders, check space, etc.)."
+    }.freeze
 
     def self.routes
       routes = {
