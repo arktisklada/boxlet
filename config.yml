@@ -22,6 +22,9 @@ pid_file: server.pid
 log_file: server.log
 public_url: http://localhost:8077
 
+gallery_username:
+gallery_password:
+
 #use s3
 s3:
   enabled: false
