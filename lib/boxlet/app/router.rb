@@ -23,7 +23,10 @@ module Boxlet
       if @method == :* || (request.get? && @method == :get) || (request.post? && @method == :post)
         Boxlet.log(:info, "INFO: Responding: #{@method.upcase} => #{@action}")
         action_response = controller.action(@action)
-        response.status = 200
+        response.status = action_response[:status]
+        action_response[:headers].each do |key, value|
+          response.header[key] = value
+        end
       else
         response.status = 404
         action_response = {format: :html, content: "404 not found"}

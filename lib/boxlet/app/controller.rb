@@ -27,13 +27,20 @@ module Boxlet
       Boxlet.log(:info, request.params)
 
       @format = :html
+      @status = 200
+      @headers = {}
     end
 
     def action(action)
       action_response = self.send(action)
       set_user if action =~ /push_files|file_list|file_info/
       
-      {format: @format, content: action_response}
+      {
+        format: @format,
+        content: action_response,
+        status: @status,
+        headers: @headers
+      }
     end
 
     # actions
@@ -178,6 +185,19 @@ module Boxlet
           '$lt' => (date + 1).to_time.strftime('%F')
         }
       }).to_a)
+    end
+
+    def gallery
+      @format = :html
+      auth = Boxlet::Handlers::Auth.new(
+        Boxlet.config[:gallery_username],
+        Boxlet.config[:gallery_password]
+      )
+      @status, @headers, content = auth.authorize(request) do
+        "yay"
+      end
+
+      content
     end
 
 

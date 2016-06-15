@@ -4,6 +4,7 @@ require 'rack/response'
 require 'rack/file_upload'
 require 'boxlet/db'
 require 'boxlet/util'
+require 'handlers/auth'
 require 'boxlet/app/router'
 require 'boxlet/app/models'
 
@@ -29,7 +30,8 @@ module Boxlet
         ["/file_list"]              => :file_list,
         ["/file_info"]              => :file_info,
         ["/resync", :get]           => :resync,
-        ["/flashback", :post]       => :flashback
+        ["/flashback", :post]       => :flashback,
+        ["/gallery", :get]          => :gallery
       }
     end
 
