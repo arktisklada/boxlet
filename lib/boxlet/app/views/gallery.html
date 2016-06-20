@@ -1,0 +1,113 @@
+<html>
+<head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    #gallery {
+      max-width: 100%;
+      margin: 1em auto;
+      padding: 1em;
+      box-shadow: 2px 2px 3px #fff;
+    }
+    .image-row {
+      display:block;
+      margin: 0.25em;
+    }
+    .image-row:after {
+      display: block;
+      content: " ";
+      clear: both;
+    }
+    .image-row li {
+      background-position: center center;
+      background-size: cover;
+      cursor: pointer;
+      float: left;
+      height: 5em;
+      list-style: none;
+      margin: 0.25em;
+      transition: opacity 300ms;
+      width: 5em;
+    }
+    .image-row li:hover {
+      opacity: 0.5;
+    }
+    .image-row li img {
+      width: 100%;
+    }
+
+    .hero-image {
+      display: block;
+      text-align: center;
+      height: 80%;
+    }
+    .hero-image img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+  <script type="text/javascript">
+    angular.module("gallery", []);
+    angular.module("gallery").controller("GalleryController", function($scope, $http) {
+      var basePath = '';
+
+      $scope.page = 1;
+      $scope.limit = 2;
+      $scope.images = [];
+      $scope.heroImage = null;
+      $scope.counter = function() {
+        var a = [],
+            pages = Math.ceil($scope.count / $scope.limit);
+        for (var i = 1; i <= pages; i++) {
+          a.push(i);
+        }
+        return a;
+      };
+
+      $scope.imageSource = function(image, size) {
+        console.log( basePath + "/" + image[size])
+        return basePath + "/" + image[size];
+      };
+
+      $scope.setHeroImage = function(image) {
+        $scope.heroImage = image;
+      };
+
+      $scope.fetchImages = function() {
+        var imagesUrl = "/gallery/images?page=" + $scope.page + "&limit=" + $scope.limit + "&uuid=asdf";
+        console.log(imagesUrl);
+
+        $http.get(imagesUrl).then(function(results) {
+          basePath = results.data.base_path;
+          $scope.basePath = basePath;
+          $scope.count = results.data.count;
+          $scope.images = results.data.images;
+          $scope.heroImage = $scope.images[0];
+        });
+      }
+
+      $scope.fetchImages();
+    });
+  </script>
+</head>
+<body ng-app="gallery">
+  <div ng-controller="GalleryController">
+    <div class="hero-image">
+      <img ng-src="{{basePath}}/{{heroImage.filename}}" />
+    </div>
+
+    <select ng-change="fetchImages()" ng-model="page" ng-options="page for page in counter() track by page">
+      <option ng-repeat="page in counter()" value="page">{{page}}</option>
+    </select>
+    <ul class="image-row">
+      <li ng-repeat="image in images" style="background-image: url({{imageSource(image, 'thumbnail')}})" ng-click="setHeroImage(image)"></li>
+    </ul>
+  </div>
+</body>
+</html>

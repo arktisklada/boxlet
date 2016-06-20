@@ -48,5 +48,35 @@ module Boxlet
       stat = Filesystem.stat(Boxlet.config[:file_system_root])
       (stat.block_size * stat.blocks).to_mb
     end
+
+    # Directory paths
+    def self.user_upload_dir(uuid)
+      dir_name = uuid || ''
+      user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + dir_name
+      Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
+
+      if uuid
+        dir_shortname = Digest::MD5.hexdigest(dir_name)
+        user_upload_dir_shortname = Boxlet.config[:upload_dir] + "/" + dir_shortname
+
+        File.symlink(dir_name, user_upload_dir_shortname) if !File.symlink? user_upload_dir_shortname
+
+        if File.symlink?(user_upload_dir_shortname)
+          user_upload_dir_shortname
+        else
+          user_upload_dir_name
+        end
+      else
+        user_upload_dir_name
+      end
+    end
+
+    def self.base_upload_path(uuid)
+      if Boxlet.config[:s3][:enabled]
+        "https://s3.amazonaws.com/#{Boxlet.config[:s3][:bucket]}/#{uuid}"
+      else
+        "#{Boxlet.config[:public_url]}/#{Boxlet.config[:upload_dir]}/#{Digest::MD5.hexdigest(uuid)}".gsub('/./', '/')
+      end
+    end
   end
 end

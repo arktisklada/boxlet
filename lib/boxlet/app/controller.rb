@@ -3,17 +3,21 @@ require 'digest'
 require 'thread'
 require 'ImageResize'
 require 'aws-sdk'
+require 'boxlet/app/templates'
 
 # routes = {
-#   ["/", :get]                 => :index,
-#   ["/auth"]                   => :auth,
-#   ["/register_device", :post] => :register_device,
-#   ["/notifications", :post]   => :notifications,
-#   ["/push_files", :post]      => :push_files,
-#   ["/file_list"]              => :file_list,
-#   ["/file_info"]              => :file_info,
-#   ["/resync", :get]           => :resync,
-#   ["/flashback", :post]       => :flashback
+  # ["/", :get]                 => :index,
+  # ["/auth"]                   => :auth,
+  # ["/register_device", :post] => :register_device,
+  # ["/notifications", :*]      => :notifications,
+  # ["/stats", :post]           => :stats,
+  # ["/push_files", :post]      => :push_files,
+  # ["/file_list"]              => :file_list,
+  # ["/file_info"]              => :file_info,
+  # ["/resync", :get]           => :resync,
+  # ["/flashback", :post]       => :flashback,
+  # ["/gallery", :get]          => :gallery,
+  # ["/gallery/images", :get]   => :gallery_images,
 # }
 
 
@@ -45,7 +49,7 @@ module Boxlet
 
     # actions
     def index
-      '<html><body><form action="/push_files" method="post" enctype="multipart/form-data">UUID:<input type="text" name="uuid"><br><input type="file" name="file"><input type="submit"></form>'
+      Templates.index
     end
 
     # def auth
@@ -189,15 +193,24 @@ module Boxlet
 
     def gallery
       @format = :html
-      auth = Boxlet::Handlers::Auth.new(
-        Boxlet.config[:gallery_username],
-        Boxlet.config[:gallery_password]
-      )
-      @status, @headers, content = auth.authorize(request) do
-        "yay"
-      end
 
-      content
+      authorized_request do
+        Templates.gallery
+      end
+    end
+
+    def gallery_images
+      @format = :json
+
+      authorized_request do
+        limit = (@params[:limit] || 50).to_i
+        skip = ((params[:page] || 1).to_i - 1) * limit
+        {
+          count: db.collection('assets').count(),
+          base_path: base_upload_path,
+          images: db.collection('assets').find().limit(limit).skip(skip).to_a
+        }
+      end
     end
 
 
@@ -212,24 +225,7 @@ module Boxlet
       end
 
       def user_upload_dir
-        dir_name = @params[:uuid] || ''
-        user_upload_dir_name = Boxlet.config[:upload_dir] + "/" + dir_name
-        Dir.mkdir(user_upload_dir_name) unless File.exists?(user_upload_dir_name)
-
-        if @params[:uuid]
-          dir_shortname = Digest::MD5.hexdigest(dir_name)
-          user_upload_dir_shortname = Boxlet.config[:upload_dir] + "/" + dir_shortname
-
-          File.symlink(dir_name, user_upload_dir_shortname) if !File.symlink? user_upload_dir_shortname
-
-          if File.symlink?(user_upload_dir_shortname)
-            user_upload_dir_shortname
-          else
-            user_upload_dir_name
-          end
-        else
-          user_upload_dir_name
-        end
+        Boxlet::Util.user_upload_dir(@params[:uuid])
       end
 
       def free_space?
@@ -237,11 +233,19 @@ module Boxlet
       end
 
       def base_upload_path
-        if Boxlet.config[:s3][:enabled]
-          "https://s3.amazonaws.com/#{Boxlet.config[:s3][:bucket]}/#{@params[:uuid]}"
-        else
-          "#{Boxlet.config[:public_url]}/#{Boxlet.config[:upload_dir]}/#{Digest::MD5.hexdigest(@params[:uuid])}".gsub('/./', '/')
+        Boxlet::Util.base_upload_path(@params[:uuid])
+      end
+
+      def authorized_request(&action)
+        auth = Boxlet::Handlers::Auth.new(
+          Boxlet.config[:gallery_username],
+          Boxlet.config[:gallery_password]
+        )
+        @status, @headers, content = auth.authorize(request) do
+          action.call
         end
+
+        content
       end
   end
 end

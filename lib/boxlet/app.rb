@@ -31,7 +31,8 @@ module Boxlet
         ["/file_info"]              => :file_info,
         ["/resync", :get]           => :resync,
         ["/flashback", :post]       => :flashback,
-        ["/gallery", :get]          => :gallery
+        ["/gallery", :get]          => :gallery,
+        ["/gallery/images", :get]   => :gallery_images,
       }
     end
 
