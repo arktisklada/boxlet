@@ -54,8 +54,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
   <script type="text/javascript">
     angular.module("gallery", []);
-    angular.module("gallery").controller("GalleryController", function($scope, $http) {
+    angular.module("gallery").controller("GalleryController", function($scope, $location, $http) {
       var basePath = '';
+          uuid = $location.search().uuid;
 
       $scope.page = 1;
       $scope.limit = 50;
@@ -80,7 +81,7 @@
       };
 
       $scope.fetchImages = function() {
-        var imagesUrl = "/gallery/images?page=" + $scope.page + "&limit=" + $scope.limit + "&uuid=asdf";
+        var imagesUrl = "/gallery/images?page=" + $scope.page + "&limit=" + $scope.limit + "&uuid=" + uuid;
         console.log(imagesUrl);
 
         $http.get(imagesUrl).then(function(results) {
