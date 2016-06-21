@@ -54,9 +54,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
   <script type="text/javascript">
     angular.module("gallery", []);
-    angular.module("gallery").controller("GalleryController", function($scope, $location, $http) {
+    angular.module("gallery").controller("GalleryController", function($scope, $window, $http) {
       var basePath = '';
-          uuid = $location.search().uuid;
+          uuid = $window.location.search.split("=")[1];
 
       $scope.page = 1;
       $scope.limit = 50;
