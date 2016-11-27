@@ -72,7 +72,6 @@
       };
 
       $scope.imageSource = function(image, size) {
-        console.log( basePath + "/" + image[size])
         return basePath + "/" + image[size];
       };
 
@@ -82,7 +81,6 @@
 
       $scope.fetchImages = function() {
         var imagesUrl = "/gallery/images?page=" + $scope.page + "&limit=" + $scope.limit + "&uuid=" + uuid;
-        console.log(imagesUrl);
 
         $http.get(imagesUrl).then(function(results) {
           basePath = results.data.base_path;
