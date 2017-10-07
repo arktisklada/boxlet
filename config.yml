@@ -22,8 +22,8 @@ pid_file: server.pid
 log_file: server.log
 public_url: http://localhost:8077
 
-gallery_username:
-gallery_password:
+gallery_username: asdf
+gallery_password: asdf
 
 #use s3
 s3:

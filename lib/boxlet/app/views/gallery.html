@@ -61,10 +61,13 @@
       $scope.page = 1;
       $scope.limit = 50;
       $scope.images = [];
+      $scope.count = 0;
       $scope.heroImage = null;
-      $scope.counter = function() {
+
+      buildCounter = function(count) {
         var a = [],
-            pages = Math.ceil($scope.count / $scope.limit);
+            pages = getPageCount();
+
         for (var i = 1; i <= pages; i++) {
           a.push(i);
         }
@@ -79,16 +82,39 @@
         $scope.heroImage = image;
       };
 
-      $scope.fetchImages = function() {
-        var imagesUrl = "/gallery/images?page=" + $scope.page + "&limit=" + $scope.limit + "&uuid=" + uuid;
+      function getPageCount() {
+        var lastPage = Math.ceil($scope.count / $scope.limit);
 
-        $http.get(imagesUrl).then(function(results) {
-          basePath = results.data.base_path;
-          $scope.basePath = basePath;
-          $scope.count = results.data.count;
-          $scope.images = results.data.images;
-          $scope.heroImage = $scope.images[0];
-        });
+        if (lastPage < 1) {
+          lastPage = 1;
+        }
+
+        return lastPage;
+      }
+
+      $scope.fetchImages = function() {
+        var imagesUrl;
+
+        $scope.limit = parseInt($scope.limit);
+
+        if ($scope.limit >= 1) {
+          var newLastPossiblePage = getPageCount();
+
+          if ($scope.page > newLastPossiblePage) {
+            $scope.page = newLastPossiblePage;
+          }
+
+          imagesUrl = "/gallery/images?page=" + $scope.page + "&limit=" + $scope.limit + "&uuid=" + uuid;
+
+          $http.get(imagesUrl).then(function(results) {
+            $scope.count = results.data.count;
+            $scope.basePath = results.data.base_path;
+            $scope.images = results.data.images;
+            $scope.heroImage = $scope.images[0];
+
+            $scope.imagePages = buildCounter($scope.count);
+          });
+        }
       }
 
       $scope.fetchImages();
@@ -101,9 +127,11 @@
       <img ng-src="{{basePath}}/{{heroImage.filename}}" />
     </div>
 
-    <select ng-change="fetchImages()" ng-model="page" ng-options="page for page in counter() track by page">
-      <option ng-repeat="page in counter()" value="page">{{page}}</option>
+    <select ng-change="fetchImages()" ng-model="page" ng-options="page for page in imagePages track by page">
     </select>
+
+    <input ng-model="limit" type="number" min="1" max="50" ng-change="fetchImages()" />
+
     <ul class="image-row">
       <li ng-repeat="image in images" style="background-image: url({{imageSource(image, 'thumbnail')}})" ng-click="setHeroImage(image)"></li>
     </ul>
