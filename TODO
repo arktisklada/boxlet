@@ -1,0 +1,8 @@
+### iOS todo:
+
+- Upgrade for iOS 12
+- send thumbnail with video
+- rotate image
+- Sync in background option http://stackoverflow.com/questions/23731043/how-to-get-server-response-data-in-nsurlsession-without-completion-block
+- Faster update with new images (i.e. images added since last sync)
+- not scaling display
