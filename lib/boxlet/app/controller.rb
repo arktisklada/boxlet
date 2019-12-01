@@ -18,6 +18,7 @@ require 'boxlet/app/templates'
   # ["/flashback", :post]       => :flashback,
   # ["/gallery", :get]          => :gallery,
   # ["/gallery/images", :get]   => :gallery_images,
+  # ["/hello", :get]            => :hello,
 # }
 
 
@@ -211,6 +212,10 @@ module Boxlet
           images: db.collection('assets').find().limit(limit).skip(skip).to_a
         }
       end
+    end
+
+    def hello
+      'hi'
     end
 
 

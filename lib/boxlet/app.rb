@@ -33,6 +33,7 @@ module Boxlet
         ["/flashback", :post]       => :flashback,
         ["/gallery", :get]          => :gallery,
         ["/gallery/images", :get]   => :gallery_images,
+        ["/hello", :get]            => :hello,
       }
     end
 
